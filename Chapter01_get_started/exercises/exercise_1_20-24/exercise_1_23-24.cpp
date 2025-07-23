@@ -43,7 +43,6 @@ int main(void){
         //print out the all transaction in the buffer
         std::cout << item1 << std::endl; 
 
-
     }
 
 }
