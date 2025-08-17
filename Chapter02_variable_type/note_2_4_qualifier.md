@@ -273,9 +273,11 @@ const int &r2 = i; // ok: can bind const int& to plain int
 
 ## ✅ constexpr 和常量表达式 (constexpr and Constant Expressions)
 
-<b>常量表达式（constant expression）</b>是指值不会改变并且在**编译过程中就能得到计算结果**的表达式。**字面值**属于常量表达式，用**常量表达式**初始化的 const 对象也是常量表达式。正如我们将要看到的，在语言中有几种上下文要求用到常量表达式。
+<b>常量表达式（constant expression）</b>是指值不会改变并且在**编译过程中就能得到计算结果**的表达式。
+- **字面值**属于常量表达式，
+- 用**常量表达式**初始化的 const 对象也是常量表达式。正如我们将要看到的，在语言中有几种上下文要求用到常量表达式。
 
-一个对象（或表达式）是不是常量表达式由它的数据类型和初始值共同决定，例如：
+一个对象（或表达式）是不是常量表达式由它的**数据类型和初始值共同决定**，例如：
 
 ```cpp
 const int max_files = 20;      // max_files is a constant expression
