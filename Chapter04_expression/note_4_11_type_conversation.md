@@ -11,7 +11,11 @@
 *   算术转换与整型提升
 *   无符号操作数的特殊情况
 *   其他隐式转换（数组到指针、指针转换、布尔转换等）
-*   显式转换（四种命名转换）
+*   显式转换
+*   static_const
+*   const_const
+*   reinterpret_cast
+*   dynamic_cast
 *   旧式转型与使用建议
 
 ---
