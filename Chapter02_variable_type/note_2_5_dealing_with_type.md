@@ -172,7 +172,7 @@ decltype(f()) sum = x;         // sum 的类型就是调用 f() 的返回类型
 ### 📝 decltype 处理规则
 
 **变量推导**：
-- ⚠️ 当 `decltype` 里的表达式是一个变量时， 会返回这个**变量的类型**包括其 top-leve `const`以及引用符 (如果有的话)
+- ⚠️ 当 `decltype` 里的表达式是一个变量时， 会返回这个**变量的类型**包括其 top-level `const`以及引用符 (如果有的话)
 
 ```cpp
 const int ci = 0, &cj = ci;
