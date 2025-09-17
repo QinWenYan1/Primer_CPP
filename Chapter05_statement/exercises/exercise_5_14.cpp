@@ -25,47 +25,72 @@ int main(void){
     vector<string> words;
     vector<int> freq; 
     string word;
+    string pre_word;  
 
     //载入到words方便处理
     //每次载入的时候检查是否有重复如果有重复我们会在freq加上一次重复次数来记录
+    cin >> pre_word;
+    words.push_back(pre_word); 
+    freq.push_back(1);
+    //index用于追踪words和freq
+    decltype(words.size()) i = 0;
     while( cin >> word ) {
-        //遍历查找是否在words里面已经出现过了该单词
-        decltype(words.size()) i = 0; 
 
-        while( (!words.empty()) && (i != words.size()) && (words[i] != word) ) ++i;
+        if( pre_word == word ){
 
-        if( i == words.size() ){
-            //如果遍历到尾后位置的话就是新的元素，添加
-            words.push_back(word);
-            freq.push_back(1);
-
-        }else{
-            //不是尾后位置， 说明已经是老元素， 那么freq相应位置加一代表frequency加一
+            //说明已经是老元素 
+            //如果上一个元素相同，那么freq相应位置加一代表frequency加一
             ++ freq[i];
 
+        }else{
+
+            //添加元素和这个元素的freq
+            //并且让这个下标下移一位， 这样我们可以最终下一个单词
+            words.push_back(word); 
+            freq.push_back(1);
+            ++ i; 
+
         }
+
+        //记录这个为上一个单词，好为后面对比
+        pre_word = word;
 
     } 
 
     //打印出来重复的结果， 没有重复的则输出警告提示
     cout << "Print out outcome ... " << endl; 
     bool is_repeated = false; 
+    unsigned max_count = 1;
+    string max_count_word; 
+
     for ( decltype(words.size()) index = 0; index != words.size(); ++index){
 
         if( freq[index] != 1 ){
+
             //出现了重复元素我们不用打印警告
+            //然后找出这个元素重复的最大次数
             is_repeated = true; 
-            cout << words[index] << " has been repeated " <<
-            freq[index] << " times ..." << endl; 
+
+            decltype(words.size()) pivot = index+1; 
+            max_count = freq[index];
+            max_count_word = words[index];
+
+            while (pivot != words.size()){
+
+                //找到更大的了
+                if( (max_count_word == words[pivot]) && (max_count < freq[pivot]) ) max_count = freq[pivot];
+                ++pivot; 
+
+            }
+
+            cout << max_count_word << " has been repeated " <<
+            max_count << " times ..." << endl; 
 
         } 
         
     }
 
-    if( !is_repeated ){
-        //没有任何元素重复过
-        cout << "There is no any word repeated ..." << endl; 
-        
-    }
+    //没有任何元素重复过
+    if( !is_repeated ) cout << "There is no any word repeated ..." << endl; 
 
 }
