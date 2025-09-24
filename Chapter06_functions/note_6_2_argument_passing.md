@@ -1,7 +1,7 @@
 # 📘 6.2 Argument Passing (参数传递)
 
 > 来源说明：C++ Primer 第6章第2节 | 本节涵盖：函数参数传递的机制、传值与传引用、const参数、数组参数等
-> 学习日期：2025-01-20 | 复习标记：0
+
 
 ## 🗺️ 知识体系图
 
@@ -41,6 +41,7 @@ graph TD
 * [*传引用机制*](#pass-by-reference)：参数作为实参的别名，修改影响原值
 * [*引用避免拷贝*](#avoid-copies)：使用const引用避免大对象拷贝
 * [*const参数*](#const-params)：顶层const被忽略，底层const影响参数匹配
+* [函数参数设计原则](#caution)：尽量使用 `const` 引用
 * [*数组参数*](#array-params)：数组自动转为指针，需额外管理大小信息
 * [*main函数参数*](#main-params)：处理命令行选项的标准方式
 * [*可变参数*](#varying-params)：initializer_list和省略号参数
@@ -212,14 +213,17 @@ int main() {
 **定义**：参数声明中的const限定符，分为顶层const（作用于对象本身）和底层const（作用于指向对象）
 
 **关键特性**：
-- **顶层const被忽略**：函数声明中的顶层const不影响重载解析
-- **底层const保留**：影响参数类型匹配
-- const引用可以绑定到临时对象，普通引用不能
+- 就像变量初始化规则一样， 当我们复制实参去初始化形参时：
+    - **顶层const被忽略**：我们可以将const或非const对象传入到有顶层const的形参中
+    - **顶层const的形参差异会导致重载失败**: 参数列表必须有实质性差异，**顶层 const 不算差异**，否则会报错
+    - **底层const保留**：可以用非常量对象初始化低层 const形参引用，但**不能反过来**；普通引用必须用同类型对象初始化
+- const引用可以绑定到临时对象如字面值，**普通引用不能绑定到 const对象， 字面值， 以及需要类型转换的对象**
+
 
 **代码示例**：
 ```cpp
 // 顶层const被忽略 - 以下两个声明冲突
-void fcn(const int i);    // 顶层const
+void fcn(const int i);    // 顶层const, 可以传入const或非const对象
 void fcn(int i);          // 错误：重定义，参数类型相同
 
 // 底层const影响匹配
@@ -240,12 +244,79 @@ int main() {
 }
 ```
 
-**注意事项**：⚠️ 将不需要修改的参数声明为const引用，可以接受更广泛的实参类型
+
+---
+<a id="caution"></a>
+## ✅ 知识点7: 函数参数设计原则：尽量使用 `const` 引用
+
+**定义 / 理论**
+当函数不需要修改传入的对象时，应将其参数声明为 `const` 引用，而不是普通引用。
+这样：
+
+* 可以传入更多类型的实参（`const` 对象、字面值、需要转换的对象）
+* 避免给调用者错误暗示（以为函数可能修改实参）
+
+
+
+**教材示例代码 / 过程**
+
+```cpp
+// ❌ 错误设计：s 是普通引用
+string::size_type find_char(string &s, char c, string::size_type &occurs);
+```
+
+调用时会出现问题：
+
+```cpp
+find_char("Hello World", 'o', ctr);  // ❌ 编译失败：字面值不能绑定到普通引用
+```
+
+更隐蔽的问题：如果我们有另一个函数参数是 `const string&`，就无法调用这个 `find_char`：
+
+```cpp
+bool is_sentence(const string &s)
+{
+    // 如果 s 的末尾有一个 '.'，则认为是句子
+    string::size_type ctr = 0;
+    return find_char(s, '.', ctr) == s.size() - 1 && ctr == 1;
+}
+
+// ❌ 编译失败：s 是 const string&，不能传给要求 string& 的 find_char
+```
+
+
+**正确设计**
+
+```cpp
+// ✅ 正确：把 s 定义为 const 引用
+string::size_type find_char(const string &s, char c, string::size_type &occurs);
+```
+
+优点：
+
+* 允许传入 const string、字面值、类型转换结果
+* 不需要修改调用者代码即可在 const 上下文使用
+* 明确表达“不会修改实参”的意图
+
+
+**注意点**
+
+* ⚠️ 普通引用限制了参数的使用范围，容易导致传播性错误（调用者也被迫不能使用 const 对象）
+* ⚠️ 不要试图通过修改调用者的参数类型来“匹配”错误的函数签名
+* 💡 正确方法是修改函数参数为 `const &`
+
+
+**最佳实践**
+
+* 当函数不修改参数 → 用 `const Type&`
+* 当函数需要修改参数 → 用 `Type&`
+* 当函数只需要值拷贝，不关心原对象 → 用值传递（按值传参）
 
 ---
 
+
 <a id="array-params"></a>
-## ✅ 知识点7: 数组参数 (Array Parameters)
+## ✅ 知识点8: 数组参数 (Array Parameters)
 
 **定义**：数组作为函数参数时，会自动转换为指向首元素的指针，需要额外处理大小信息
 
@@ -297,7 +368,7 @@ int main() {
 ---
 
 <a id="array-reference-params"></a>
-## ✅ 知识点8: 数组引用参数 (Array Reference Parameters)
+## ✅ 知识点9: 数组引用参数 (Array Reference Parameters)
 
 **定义**：参数可以声明为数组的引用，此时数组大小成为类型的一部分
 
@@ -330,7 +401,7 @@ int main() {
 ---
 
 <a id="multidimensional-arrays"></a>
-## ✅ 知识点9: 多维数组参数 (Multidimensional Array Parameters)
+## ✅ 知识点10: 多维数组参数 (Multidimensional Array Parameters)
 
 **定义**：多维数组作为参数时，传递的是指向第一维数组的指针
 
@@ -351,7 +422,7 @@ void print(int matrix[3][10]);           // 第一维大小3被忽略，实际�
 ---
 
 <a id="main-params"></a>
-## ✅ 知识点10: main函数参数 (main: Handling Command-Line Options)
+## ✅ 知识点11: main函数参数 (main: Handling Command-Line Options)
 
 **定义**：main函数可以接受命令行参数，用于程序配置和选项处理
 
@@ -393,7 +464,7 @@ int main(int argc, char **argv) { ... }
 ---
 
 <a id="varying-params"></a>
-## ✅ 知识点11: 可变参数函数 (Functions with Varying Parameters)
+## ✅ 知识点12: 可变参数函数 (Functions with Varying Parameters)
 
 **定义**：接受可变数量参数的函数，主要有initializer_list和省略号两种方式
 
