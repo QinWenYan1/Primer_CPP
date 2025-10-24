@@ -49,7 +49,7 @@ class Sales_data{
         std::string bookNo = "None"; 
 
         //计算平均price在combine之后
-        double inline avg_price(double total_price, unsigned total_num){ return total_price/total_num; } 
+        inline double avg_price(double total_price, unsigned total_num){ return total_price/total_num; } 
 
     //friend functions
     friend inline std::ostream &print(std::ostream &, const Sales_data &);
