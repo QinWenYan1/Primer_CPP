@@ -170,9 +170,9 @@ uival + lval;       // 根据相对大小转换
 ```cpp
 cast-name<type>(expression);
 ```
-* **`type`**：目标转换类型。
-* **`expression`**：要转换的值或表达式。
-* 如果 `type` 是引用类型，则结果是一个左值。
+* **`type`**：目标转换类型
+* **`expression`**：要转换的值或表达式
+* 如果 `type` 是引用类型，则结果是一个左值，其他情况为右值
 * `cast-name` 确定执行哪种转换类型。
 
 ---
