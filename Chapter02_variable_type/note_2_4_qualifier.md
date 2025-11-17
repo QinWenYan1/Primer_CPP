@@ -310,7 +310,8 @@ constexpr int sz = size();     // ok only if size is a constexpr function
 
 ### 📝 字面值类型
 
-- 由于常量表达式必须在编译时就能求值，因此用于 `constexpr` 声明的类型受到限制。通常，这类类型比较简单、值显而易见，被称为字面值类型（literal type）。
+- 由于常量表达式必须在编译时就能求值，因此用于 `constexpr` 声明的类型受到限制。通常，这些可以用于`constexpr`的类型比较简单、值显而易见，被称为**字面类型**（literal type）
+
 
 - 目前为止，我们接触过的字面值类型包括：**算术类型**、**引用和指针**。而像 `Sales_item` 类、IO 库、`string` 类型都不是字面值类型，因此不能用作 `constexpr`。
 
