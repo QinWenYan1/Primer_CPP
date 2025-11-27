@@ -248,7 +248,7 @@ graph TD
 
 **注意点**
 * ⚠️ `forward_list`迭代器**不支持**递减(`--`)运算符
-* 🔄 迭代器算术运算（3.7章的表）仅适用于`string`、`vector`、`deque`和`array`的迭代器
+* 🔄 迭代器**算术运算**（3.7章的表）仅适于<b>`string`、`vector`、`deque`和`array`的迭代器</b>
 
 ---
 
