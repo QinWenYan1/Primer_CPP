@@ -296,15 +296,19 @@ while (begin != end) {
 ---
 
 <a id="id10"></a>
-### ✅ 知识点3.3: begin和end成员
+## ✅ 知识点3.3: `begin`和`end`成员
 
 **理论**
 * `begin()`和`end()`操作生成引用容器中第一个和最后一个元素之后位置的迭代器
 * 这些迭代器最常用于形成包含容器中所有元素的迭代器范围
 
-**begin和end的版本**
-* 带r的版本返回反向迭代器
-* 以c开头的返回相关迭代器的const版本
+**`begin`和`end`的版本**
+* 带`r`的版本返回**反向**迭代器
+* 以`c`开头的返回相关迭代器**的`const`版本**
+* 不带`c`的函数是重载的：一个是`const`成员返回`const_iterator`类型，另一个是非`const`成员返回`iterator`类
+
+**与`begin`，`end`共同使用`auto`**(C++11)
+* C++11标准支持将`auto`和`begin`, `end`函数共同使用
 
 **教材示例代码**
 ```cpp
@@ -313,12 +317,19 @@ auto it1 = a.begin();    // list<string>::iterator
 auto it2 = a.rbegin();   // list<string>::reverse_iterator  
 auto it3 = a.cbegin();   // list<string>::const_iterator
 auto it4 = a.crbegin();  // list<string>::const_reverse_iterator
+
+// 类型需要显示
+list<string>::iterator it5 = a.begin();
+list<string>::const_iterator it6 = a.begin();
+// iterator或者const_iterator取决于a类型
+auto it7 = a.begin(); // const_iterator只有当a是const
+auto it8 = a.cbegin(); // it8是const_iterator
+
 ```
 
 **注意点**
-* 💡 不带c的函数是重载的：一个是const成员，另一个是非const成员
-* 🎯 当不需要写访问时，使用cbegin和cend
-* 🔄 c版本支持将auto与begin和end函数一起使用
+* 💡 当**不需要**写访问时，使用`cbegin`和`cend`
+
 
 ---
 
