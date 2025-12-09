@@ -133,7 +133,7 @@ graph TD
 | :--- | :--- |
 | `c.insert(args)` | 将 `args` 指定的元素复制到 `c` 中 |
 | `c.emplace(inits)` | 使用 `inits` 在 `c` 中构造一个元素 |
-| `c.erase(args)` | 删除由 `args` 指定的元素 |
+| `c.erase(args)` | 删除由 `args`迭代器指定的元素 |
 | `c.clear()` | 从 `c` 中移除所有元素；返回 `void` |
 
 ---
