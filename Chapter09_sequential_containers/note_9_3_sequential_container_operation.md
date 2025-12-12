@@ -456,7 +456,7 @@ elem1 = slist.erase(elem1, elem2); // elem1 == elem2
 ---
 
 <a id="id15"></a>
-### ✅ 知识点3.3: clear清空容器
+### ✅ 知识点3.3: `clear`清空容器
 
 **理论**
 * `clear()`删除容器所有元素，返回void。等价于`erase(begin(), end())`
