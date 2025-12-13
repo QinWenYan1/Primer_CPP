@@ -387,7 +387,7 @@ if (!c.empty()) {
 | `c.pop_back()` | 删除尾元素 | `void` | 未定义 |
 | `c.pop_front()` | 删除首元素 | void | 未定义 |
 | `c.erase(p)` | 删除迭代器p指向元素 | 被删元素后迭代器 | p为尾后迭代器时未定义 |
-| `c.erase(b, e)` | 删除范围`[b, e)`元素 | `e` | - |
+| `c.erase(b, e)` | 删除范围`[b, e)`元素 | `e` | 如果`e`为尾后迭代器返回尾后迭代器 |
 | `c.clear()` | 删除所有元素 | `void` | - |
 
 **注意点**
@@ -423,12 +423,15 @@ while (!ilist.empty()) {
 ---
 
 <a id="id14"></a>
-### ✅ 知识点3.2: erase删除指定元素
+### ✅ 知识点3.2: `erase`删除指定元素
 
 **理论**
-* `erase(p)`删除迭代器`p`指向的单个元素
+* `erase(p)`删除迭代器`p`指向的单个元素， 如果p是尾后位置迭代器，行为未定义
 * `erase(b, e)`删除范围为[b, e）的元素，注意是左闭右开
-* 两者都返回指向**被删元素后一个位置的迭代器**
+    * 返回指向被删元素后一个位置的迭代器
+    * 或者返回尾后迭代器如果`e`就是尾后迭代器
+    * 如果`p`表示的是最后一个元素，则返回尾后迭代器
+    * 如果`p`表示的是尾后迭代器，表现未定义
 
 
 **代码示例**
@@ -464,26 +467,54 @@ elem1 = slist.erase(elem1, elem2); // elem1 == elem2
 ---
 
 <a id="id16"></a>
-## ✅ 知识点4: forward_list特殊操作
+## ✅ 知识点4: `forward_list`特殊操作
 
 **理论**
-forward_list的插入删除操作更复杂，因为需要访问被修改元素的前驱。标准库提供`insert_after`、`emplace_after`和`erase_after`操作，它们修改给定元素之后的元素。
+* `forward_list`的插入删除操作更复杂，因为需要访问被修改元素的前驱
+* **原理**：
+    * **单链表**删除元素需要修改前驱(predecessor)节点的链接
+    * 由于单链表性质无法直接访问前驱
+    * `forward_list`操作通过"修改给定元素之后的元素"来实现插入删除
+* 由于`forward_list`的`insert`, `emplace`等有着不同的表现，其定义了自己版本的操作:
+    * `insert_after`、`emplace_after`和`erase_after`
+    * 它们修改给定元素之后的元素
 
-**设计原理**
-单链表删除元素需要修改前驱节点的链接。由于无法直接访问前驱，forward_list操作通过"修改给定元素之后的元素"来实现插入删除。
+
 
 ---
 
 <a id="id17"></a>
-### ✅ 知识点4.1: insert_after/emplace_after
+### ✅ 知识点4.1: `insert_after`/`emplace_after`
 
 **理论**
 在指定迭代器之后插入元素：
-- `insert_after(p, t)`：在p后插入t
-- `insert_after(p, n, t)`：在p后插入n个t
-- `insert_after(p, b, e)`：在p后插入范围元素
-- `insert_after(p, il)`：在p后插入初始化列表
-- `emplace_after(p, args)`：在p后构造元素
+- `insert_after(p, t)`：在`p`后插入`t`
+- `insert_after(p, n, t)`：在`p`后插入n个`t`
+- `insert_after(p, b, e)`：在`p`后插入范围元素
+- `insert_after(p, il)`：在`p`后插入初始化列表
+    - 以上`insert`返回最后一个插入的元素， 如果范围为空就返回`p`
+    - 如果`p`为尾后迭代器， 那么表现未定义
+- `emplace_after(p, args)`：在`p`后构造元素
+    - `emplace`返回指向新插入的元素的迭代器
+    - 如果`p`是尾后迭代器则表现未定义
+
+
+
+**注意点**
+* ⚠️ p不能是尾后迭代器
+* 💡 需要维护两个迭代器：一个指向**当前元素**，一个**指向其前驱**
+
+---
+
+<a id="id18"></a>
+### ✅ 知识点4.2: `erase_after`
+
+**理论**
+* `erase_after(p)`删除`p`之后的单个元素
+* `erase_after(b, e)`删除(b, e)范围（不包括b，包括e后）
+    * 返回指向被删元素后一个位置的迭代器
+    * 或者返回尾后迭代器如果没有找到目标元素
+    * 表现未定义如果`p`表示的是最后一个元素或是尾后位置                                                 
 
 **代码示例**
 ```cpp
@@ -499,35 +530,24 @@ while (curr != flst.end()) {
         ++curr;
     }
 }
-```
+```                                    
 
 **注意点**
-* ⚠️ p不能是尾后迭代器
-* 💡 需要维护两个迭代器：一个指向当前元素，一个指向其前驱
-
----
-
-<a id="id18"></a>
-### ✅ 知识点4.2: erase_after
-
-**理论**
-`erase_after(p)`删除p之后的单个元素，`erase_after(b, e)`删除(b, e)范围（不包括b，包括e后）。返回指向被删元素后一个位置的迭代器。
-
-**注意点**
-* ⚠️ p不能指向最后一个元素或尾后迭代器
+* ⚠️ `p`**不能**指向最后一个元素或尾后迭代器
 * ⚠️ 删除后需正确更新迭代器以避免失效
 
 ---
 
 <a id="id19"></a>
-### ✅ 知识点4.3: before_begin迭代器
+### ✅ 知识点4.3: `before_begin`迭代器
 
 **理论**
-`before_begin()`返回指向首元素前"不存在的元素"的迭代器，用于在首元素前插入或删除。`cbefore_begin()`返回const_iterator。
+* `before_begin()`返回指向首元素前"不存在的元素"的迭代器，用于在首元素前插入或删除
+* `cbefore_begin()`返回`const_iterator`
 
 **注意点**
-* ⚠️ before_begin()返回的迭代器不能解引用
-* 💡 它是实现forward_list头部操作的必要工具
+* ⚠️ `before_begin()`返回的迭代器不能解引用
+* 💡 它是实现`forward_list`头部操作的必要工具
 
 ---
 
