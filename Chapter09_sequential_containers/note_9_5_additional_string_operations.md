@@ -39,7 +39,7 @@ graph TD
 * [*知识点1.1: 三种额外构造函数详解*](#id2)：从字符数组和string构造子串
   * [*知识点1.2: substr子串提取操作*](#id3)：返回原字符串的部分或全部拷贝
 * [*知识点2: 其他修改string的方式*](#id4)：assign、insert、append和replace操作
-* [*知识点2.1: assign和insert操作*](#id5)：替换和插入字符的多种方式
+* [*知识点2.1: assign，erase和insert操作*](#id5)：替换和插入字符的多种方式
   * [*知识点2.2: append和replace函数*](#id6)：追加内容和替换子串的快捷操作
   * [*知识点2.3: insert和assign的重载版本*](#id7)：支持索引和迭代器的多种参数组合
 * [*知识点3: string搜索操作*](#id8)：在string中查找字符或子串
@@ -126,7 +126,9 @@ string s5 = s.substr(12);   // 抛出out_of_range异常
 ## ✅ 知识点2: 其他修改`string`的方式
 
 **理论**
-`string`支持顺序容器的赋值运算符以及`assign`、`insert`和`erase`操作。此外还提供接受索引的版本，以及使用C风格字符数组的`assign`和`insert`版本。
+* `string`支持顺序容器的赋值运算符以及`assign`、`insert`和`erase`操作
+* 此外还提供接受索引的版本，以及使用C风格字符数组的`assign`和`insert`版本
+  * **索引vs迭代器**：`string`同时提供接受**索引**和**迭代器**的版本，方便不同使用
 
 **教材示例代码**
 ```cpp
@@ -138,16 +140,44 @@ s.erase(s.size() - 5, 5);       // 删除最后5个字符
 ```
 
 **注意点**
-* 🔄 **append是简写**：append操作是insert在末尾插入的简写形式
-* 🎯 **索引vs迭代器**：string同时提供接受索引和迭代器的版本，方便不同使用场景
+* 🔄 **`append`是简写**：`append`操作是`insert`在末尾插入的简写形式
 
 ---
 
 <a id="id5"></a>
-### ✅ 知识点2.1: assign和insert操作
+### ✅ 知识点2.1: `assign`，`erase`和`insert`操作
 
 **理论**
-assign替换string的全部内容，insert在指定位置前插入字符。两者都有多个重载版本，支持从string、字符数组、字符计数等多种来源。
+* `assign`替换`string`的全部内容，`insert`在指定位置前插入字符
+  * `insert(cp, n)`请求的字符数一定少于或等于`cp`所指向字符数组大小（`null`不算）
+* **两者都有多个重载版本**：支持从`string`、C风格字符数组、字符计数等多种来源
+好，继续**极简 + 明了版**👇
+
+
+* `s.insert(pos, args)`
+
+  👉 **在 `pos` 前插入 `args`**
+  👉 `pos` 可以是 **下标** 或 **迭代器**
+  👉 用下标：返回 `s`
+  👉 用迭代器：返回 **新插入的第一个字符的迭代器**
+
+
+
+* `s.erase(pos, len)`
+
+  👉 **从 `pos` 开始删 `len` 个字符**
+  👉 不写 `len`：**从 `pos` 删到结尾**
+  👉 返回 `s`
+
+
+
+* `s.assign(args)`
+
+  👉 **用 `args` 整体替换 `s` 的内容**
+  👉 相当于重新赋值
+  👉 返回 `s`
+
+
 
 **教材示例代码**
 ```cpp
@@ -162,16 +192,37 @@ s2.insert(0, s3, 0, s3.size()); // 等价形式
 ```
 
 **注意点**
-* ⚠️ **assign的替换性**：assign总是替换整个string内容
-* ⚠️ **insert位置**：插入发生在给定位置之前，位置可以是索引或迭代器
+* ⚠️ **`assign`的替换性**：`assign`总是替换整个`string`内容
+* ⚠️ **`insert`位置**：插入发生在给定**位置之前**，位置可以是索引或迭代器
 
 ---
 
 <a id="id6"></a>
-### ✅ 知识点2.2: append和replace函数
+### ✅ 知识点2.2: `append`和`replace`函数
 
 **理论**
-append是向string末尾添加内容的简写形式。replace是erase和insert的组合，先删除指定范围的字符，再插入新字符。
+* `append`是向`string`末尾添加内容的简写形式
+* `replace`是`erase`和`insert`的组合，先删除指定范围的字符，再插入新字符
+  * **`replace`的灵活性**：**可以**删除和插入不同长度的字符串
+
+* `s.append(args)`
+
+  👉 **把 `args` 追加到 `s` 末尾**
+  👉 不删原内容
+  👉 返回 `s`
+
+* `s.replace(range, args)`
+
+  👉 **删掉 `s` 中的一段，再用 `args` 替换**
+  👉 `range` = 下标+长度 **或** 两个迭代器
+  👉 返回 `s`
+
+
+
+* `args`
+
+  👉 可以是 `string`、`char*`、指针+长度、迭代器范围（和 `assign/append` 一样）
+
 
 **教材示例代码**
 ```cpp
@@ -183,16 +234,17 @@ s.replace(11, 3, "Fifth"); // s == "C++ Primer Fifth Ed."
 ```
 
 **注意点**
-* 🔄 **replace的灵活性**：可以删除和插入不同长度的字符串
-* 💡 **返回值**：所有修改操作都返回string的引用，支持链式调用
+* 💡 **返回值**：所有修改操作都返回`string`的引用，支持链式调用
+* ⚠️ 替换用的内容 **不能来自 `s` 自己**
+* ⚠️ 传入的迭代器 **不能指向 `s`**
 
 ---
 
 <a id="id7"></a>
-### ✅ 知识点2.3: insert和assign的重载版本
+### ✅ 知识点2.3: `insert`和`assign`的重载版本
 
 **理论**
-修改操作有多种重载版本，新字符可来自另一个string、字符指针、花括号列表或字符加计数。不同函数支持的参数组合不同。
+修改操作有多种重载版本，新字符可来自另一个`string`、字符指针、花括号列表或字符加计数。不同函数支持的参数组合不同。
 
 **参数支持表**
 | 参数形式 | replace(pos,len,args) | replace(b,e,args) | insert(pos,args) | insert(iter,args) |
@@ -206,13 +258,13 @@ s.replace(11, 3, "Fifth"); // s == "C++ Primer Fifth Ed."
 | initializer list | no             | yes               | no               | yes               |
 
 **注意点**
-* ⚠️ **参数限制**：insert接受索引时不能使用initializer list；insert使用迭代器时不能使用字符指针
-* ⚠️ **str必须独立**：str必须与目标string不同，迭代器b和e不能指向目标string
+* ⚠️ **参数限制**：`insert`接受索引时不能使用`initializer list`；`insert`使用迭代器时不能使用字符指针
+* ⚠️ **str必须独立**：`str`必须与目标`string`不同，迭代器`b`和`e`不能指向目标`string`
 
 ---
 
 <a id="id8"></a>
-## ✅ 知识点3: string搜索操作
+## ✅ 知识点3: `string`搜索操作
 
 **理论**
 string类提供六个不同的搜索函数，每个都有四个重载版本。搜索是区分大小写的，返回找到位置的索引或`string::npos`（表示未找到）。
