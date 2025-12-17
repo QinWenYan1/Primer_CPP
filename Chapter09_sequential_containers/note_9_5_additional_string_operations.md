@@ -55,7 +55,7 @@ graph TD
 ## ✅ 知识点1: 其他构造`string`的方式
 
 **理论**
-* `string`类型提供三种额外的构造函数
+* `string`类型提供三种额外的**构造函数**
   * 这些构造函数支持与C风格字符数组的紧密交互，
   * 并允许使用索引代替迭代器来构造子串
   * 此外，`string`还提供`substr`操作来提取子串
@@ -76,8 +76,10 @@ string s8(s1, 16); // 抛出out_of_range异常
 ```
 
 **注意点**
-* ⚠️ **Null终止要求**：从`const char*`构造时，数组通常必须以null终止；若同时传递计数，则不要求null终止
-* ⚠️ **越界检查**：从string构造时，起始位置必须≤string大小，否则会抛出`out_of_range`异常
+* ⚠️ **Null终止要求**：从`const char*`构造时，数组**必须**以`null`终止
+  * 若同时传递计数，则不要求`null`终止
+  * 如果n超过了`string`的长度并且没有`null`终止的话，那么表现未定义
+* ⚠️ **越界检查**：从`string`构造时，起始位置必须≤`string`大小，否则会抛出`out_of_range`异常
 * 💡 **计数调整**：若请求字符数超过实际可用数量，库会自动调整为最多拷贝到字符串末尾
 
 ---
@@ -86,23 +88,25 @@ string s8(s1, 16); // 抛出out_of_range异常
 ### ✅ 知识点1.1: 三种额外构造函数详解
 
 **理论**
-string支持三种额外的构造函数，参数均为unsigned类型：
-1. `string s(cp, n)`：从字符数组指针cp指向的前n个字符拷贝
-2. `string s(s2, pos2)`：从string s2的pos2位置开始拷贝到末尾
-3. `string s(s2, pos2, len2)`：从s2的pos2位置开始拷贝len2个字符，最多拷贝`s2.size() - pos2`个
+string支持三种额外的构造函数，参数均为`unsigned`类型：
+1. `string s(cp, n)`：从字符数组指针`cp`指向的前`n`个字符拷贝
+2. `string s(s2, pos2)`：从string `s2`的`pos2`位置开始拷贝到末尾
+3. `string s(s2, pos2, len2)`：从`s2`的`pos2`位置开始拷贝`len2`个字符，最多拷贝`s2.size() - pos2`个
 
 **技术规范**
 * 对于`string s(cp, n)`：数组必须至少有n个字符
-* 对于`string s(s2, pos2)`：若pos2 > s2.size()，行为未定义
+* 对于`string s(s2, pos2)`：若`pos2` > `s2.size()`，行为未定义
 * 对于`string s(s2, pos2, len2)`：无论如何，最多拷贝`s2.size() - pos2`个字符
 
 ---
 
 <a id="id3"></a>
-### ✅ 知识点1.2: substr子串提取操作
+### ✅ 知识点1.2: `substr`子串提取操作
 
 **理论**
-substr操作返回一个string，是原字符串的部分或全部拷贝。可传递可选的起始位置和计数，返回从pos开始的n个字符，若pos + n超过大小则调整计数。
+* `substr`操作返回一个`string`，是原字符串的部分或全部**拷贝**
+* 可传递可选的起始位置和计数，返回从`pos`开始的`n`个字符，若`pos` + `n`超过大小则调整计数
+  * **默认参数**：`pos`默认为0，n默认为拷贝从`pos`到末尾的所有字符
 
 **教材示例代码**
 ```cpp
@@ -114,16 +118,15 @@ string s5 = s.substr(12);   // 抛出out_of_range异常
 ```
 
 **注意点**
-* ⚠️ **异常处理**：若pos超过字符串大小，抛出`out_of_range`异常
-* ⚠️ **默认参数**：pos默认为0，n默认为拷贝从pos到末尾的所有字符
+* ⚠️ **异常处理**：若`pos`超过字符串大小，抛出`out_of_range`异常
 
 ---
 
 <a id="id4"></a>
-## ✅ 知识点2: 其他修改string的方式
+## ✅ 知识点2: 其他修改`string`的方式
 
 **理论**
-string支持顺序容器的赋值运算符以及assign、insert和erase操作。此外还提供接受索引的版本，以及使用C风格字符数组的assign和insert版本。
+`string`支持顺序容器的赋值运算符以及`assign`、`insert`和`erase`操作。此外还提供接受索引的版本，以及使用C风格字符数组的`assign`和`insert`版本。
 
 **教材示例代码**
 ```cpp
