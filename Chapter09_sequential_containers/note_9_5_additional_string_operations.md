@@ -297,11 +297,14 @@ b, e           → 迭代器区间 [b, e)
 ## ✅ 知识点3: `string`搜索操作
 
 **理论**
-string类提供六个不同的搜索函数，每个都有四个重载版本。搜索是区分大小写的，返回找到位置的索引或`string::npos`（表示未找到）
+* `string`类提供六个不同的搜索函数，每个都有四个重载版本
+* 搜索是区分大小写的，返回找到位置的索引(类型为`string::size_type`)
+* 或`string::npos`（表示未找到）
+  * `string::npos`是一个静态成员
+  * 标准库定义其为`const string::size_type`类型，值为-1
+  * 因为`npos`为`unsigned`，所以其等于最大的可能字符串大小
 
-**核心概念**
-* `string::npos`是静态成员，为unsigned类型，初始化为-1，代表string可能的最大大小
-* 所有搜索操作返回`string::size_type`，不应使用signed类型存储
+
 
 **教材示例代码**
 ```cpp
@@ -311,6 +314,8 @@ auto pos1 = name.find("Anna"); // pos1 == 0
 string lowercase("annabelle");
 pos1 = lowercase.find("Anna"); // pos1 == npos（未找到）
 ```
+**注意**
+* ⚠️ 字符串搜索函数返回的是无符号的 `string::size_type`，因此不应使用 `int` 等有符号类型来接收其返回值。
 
 ---
 
@@ -318,12 +323,12 @@ pos1 = lowercase.find("Anna"); // pos1 == npos（未找到）
 ### ✅ 知识点3.1: 六种搜索函数详解
 
 **理论**
-1. `s.find(args)`：查找args第一次出现的位置
-2. `s.rfind(args)`：查找args最后一次出现的位置
-3. `s.find_first_of(args)`：查找args中任意字符第一次出现的位置
-4. `s.find_last_of(args)`：查找args中任意字符最后一次出现的位置
-5. `s.find_first_not_of(args)`：查找第一个不在args中的字符
-6. `s.find_last_not_of(args)`：查找最后一个不在args中的字符
+1. `s.find(args)`：查找`args`第一次出现的位置，没有就返回`npos`
+2. `s.rfind(args)`：查找`args`最后一次出现的位置，没有就返回`npos`
+3. `s.find_first_of(args)`：查找`args`中任意字符第一次出现的位置，没有就返回`npos`
+4. `s.find_last_of(args)`：查找`args`中任意字符最后一次出现的位置，没有就返回`npos`
+5. `s.find_first_not_of(args)`：查找第一个不在`args`中的字符，没有就返回`npos`
+6. `s.find_last_not_of(args)`：查找最后一个不在`args`中的字符，没有就返回`npos`
 
 **教材示例代码**
 ```cpp
@@ -335,8 +340,9 @@ auto pos2 = dept.find_first_not_of(numbers); // 返回5，第一个非数字字�
 ```
 
 **注意点**
-* 🎯 **区分函数语义**：`find`查找完整子串，`find_first_of`查找字符集合中的任意字符
-* ⚠️ **npos检查**：必须检查返回值是否等于`npos`来判断是否找到
+* ⚠️ **区分函数语义**：`find`查找完整子串，`find_first_of`查找字符集合中的任意字符
+* ⚠️ **`npos`检查**：必须检查返回值是否等于`npos`来判断是否找到
+* ⚠️ 这些查找都是大小写敏感，一定要注意
 
 ---
 
@@ -344,7 +350,8 @@ auto pos2 = dept.find_first_not_of(numbers); // 返回5，第一个非数字字�
 ### ✅ 知识点3.2: 搜索起始位置的指定
 
 **理论**
-所有搜索函数都接受可选的第二个参数pos，指定从字符串的哪个位置开始搜索，默认为0。利用此特性可循环查找所有匹配项。
+* 所有搜索函数都接受可选的第二个参数`pos`，指定从字符串的哪个位置开始搜索，默认为0
+* 利用此特性可循环查找所有匹配项。
 
 **教材示例代码**
 ```cpp
@@ -358,7 +365,7 @@ while ((pos = name.find_first_of(numbers, pos)) != string::npos) {
 ```
 
 **注意点**
-* ⚠️ **必须递增pos**：若不递增，可能陷入无限循环
+* ⚠️ **必须递增`pos`**：若不递增，可能陷入无限循环
 * 💡 **编程模式**：这是遍历字符串查找所有匹配的标准模式
 
 ---
@@ -367,7 +374,11 @@ while ((pos = name.find_first_of(numbers, pos)) != string::npos) {
 ### ✅ 知识点3.3: 向后搜索操作
 
 **理论**
-rfind系列操作从右向左搜索。`rfind`查找子串最后一次出现，`find_last_of`查找字符集合中任意字符最后一次出现，`find_last_not_of`查找最后一个不匹配字符。
+* `rfind`系列操作从右向左搜索
+* `rfind`查找子串最后一次出现
+* `find_last_of`查找字符集合中任意字符最后一次出现
+* `find_last_not_of`查找最后一个不匹配字符
+* 这些所有的函数都有第二个选择性的参数指定开始搜索位置
 
 **教材示例代码**
 ```cpp
@@ -383,10 +394,12 @@ auto last_pos = river.rfind("is");    // 返回4，最后一个"is"
 ---
 
 <a id="id12"></a>
-## ✅ 知识点4: compare函数
+## ✅ 知识点4: `compare`函数
 
 **理论**
-string提供compare函数，类似C库strcmp，返回0（相等）、正值（大于）或负值（小于）。支持多种参数形式，可比较整个或部分字符串。
+* `string`提供`compare`函数，类似C库`strcmp`
+* `s.compare`返回0（相等）、正值（大于）或负值（小于）。支持多种参数形式
+* 可比较整个或部分字符串
 
 **参数形式**
 * `s2`：比较s和s2
