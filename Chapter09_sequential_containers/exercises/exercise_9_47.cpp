@@ -48,8 +48,6 @@ inline void find_not_numeric_operation(string str){
 
 }
 
-
-
 int main(){
 
     string name("ab2c3d7R4E6");
