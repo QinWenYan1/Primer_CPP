@@ -241,13 +241,26 @@ s.replace(11, 3, "Fifth"); // s == "C++ Primer Fifth Ed."
 ---
 
 <a id="id7"></a>
-### ✅ 知识点2.3: `insert`和`assign`的重载版本
+### ✅ 知识点2.3: 不同的重载版本
+
+
 
 **理论**
-修改操作有多种重载版本，新字符可来自另一个`string`、字符指针、花括号列表或字符加计数。不同函数支持的参数组合不同。
+* 修改操作有多种重载版本，其参数各异，主要关系到哪些字符和哪部分的字符串需要修改
+* 幸运的是， 这些函数都用相同接口
+* `append`, `assign`没有必要精确哪一部分的字符串需要修改
+
+**函数区别**
+
+* `assign(args)`：**整体替换**
+* `insert(pos, args)`：在**下标 pos 前插入**
+* `insert(iter, args)`：在**迭代器前插入**
+* `replace(pos, len, args)`：**替换一段**
+* `replace(b, e, args)`：**替换区间**
+
 
 **参数支持表**
-| 参数形式 | replace(pos,len,args) | replace(b,e,args) | insert(pos,args) | insert(iter,args) |
+| `args`参数形式 | replace(pos,len,args) | replace(b,e,args) | insert(pos,args) | insert(iter,args) |
 |----------|----------------------|-------------------|------------------|-------------------|
 | str      | yes                  | yes               | yes              | no                |
 | str,pos,len | yes              | no                | yes              | no                |
@@ -257,9 +270,26 @@ s.replace(11, 3, "Fifth"); // s == "C++ Primer Fifth Ed."
 | b2,e2    | no                   | yes               | no               | yes               |
 | initializer list | no             | yes               | no               | yes               |
 
+
+
+
+
+* `args` 的几种常见形式（总结）
+
+```text
+str            → 整个 string
+str, pos, len  → string 的一部分
+cp, len        → C 字符串的前 len 个字符
+cp             → 以 '\0' 结尾的 C 字符串
+n, c           → n 个字符 c
+b, e           → 迭代器区间 [b, e)
+{…}            → 花括号里的字符列表
+```
+
+
 **注意点**
 * ⚠️ **参数限制**：`insert`接受索引时不能使用`initializer list`；`insert`使用迭代器时不能使用字符指针
-* ⚠️ **str必须独立**：`str`必须与目标`string`不同，迭代器`b`和`e`不能指向目标`string`
+
 
 ---
 
@@ -267,7 +297,7 @@ s.replace(11, 3, "Fifth"); // s == "C++ Primer Fifth Ed."
 ## ✅ 知识点3: `string`搜索操作
 
 **理论**
-string类提供六个不同的搜索函数，每个都有四个重载版本。搜索是区分大小写的，返回找到位置的索引或`string::npos`（表示未找到）。
+string类提供六个不同的搜索函数，每个都有四个重载版本。搜索是区分大小写的，返回找到位置的索引或`string::npos`（表示未找到）
 
 **核心概念**
 * `string::npos`是静态成员，为unsigned类型，初始化为-1，代表string可能的最大大小
