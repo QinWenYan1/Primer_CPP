@@ -130,11 +130,11 @@ stack<string, vector<string>> str_stk2(svec);
 ---
 
 <a id="id4"></a>
-## ✅ 知识点2: 栈适配器stack
+## ✅ 知识点2: 栈适配器`stack`
 
 **理论**
-* stack类型定义在<stack>头文件中
-* 栈遵循后进先出（LIFO）原则
+* `stack`类型定义在`<stack>`头文件中
+* 栈遵循**后进先出**（LIFO）原则
 * 只能访问栈顶元素
 * 通过限制对底层容器的操作，提供栈的语义
 
@@ -154,8 +154,8 @@ while (!intStack.empty()) {  // 栈中仍有值时
 
 **注意点**
 * ⚠️ 栈操作是底层容器操作的封装
-* 💡 实际调用的是底层容器的push_back、pop_back、back等操作
-* 🔄 虽然stack默认基于deque，但不能直接调用deque的操作
+* 💡 实际调用的是底层容器的`push_back`、`pop_back`、`back`等操作
+* 🔄 虽然`stack`默认基于`deque`，但不能直接调用`deque`的操作
 
 ---
 
@@ -163,7 +163,7 @@ while (!intStack.empty()) {  // 栈中仍有值时
 ### ✅ 知识点2.1: 栈的操作
 
 **理论**
-* 表9.18中列出的栈专用操作：
+* 栈专用操作：
   - `s.pop()`：移除但不返回栈顶元素
   - `s.push(item)`：通过拷贝或移动item创建新栈顶元素
   - `s.emplace(args)`：通过args构造栈顶元素
@@ -171,25 +171,26 @@ while (!intStack.empty()) {  // 栈中仍有值时
 * 这些操作是对底层容器操作的封装
 
 **注意点**
-* ⚠️ pop()不返回被移除的元素，需要先通过top()获取
-* 💡 emplace()直接在栈顶构造元素，避免拷贝
-* ⚠️ 对空栈调用top()或pop()是未定义行为
+* ⚠️ `pop()`不返回被移除的元素，需要先通过`top()`获取
+* 💡 `emplace()`直接在栈顶构造元素，避免拷贝
+* ⚠️ 对**空栈**调用`top()`或`pop()`是未定义行为
 
 ---
 
 <a id="id6"></a>
-## ✅ 知识点3: 队列适配器queue和priority_queue
+## ✅ 知识点3: 队列适配器`queue`和`priority_queue`
 
 **理论**
-* queue和priority_queue定义在<queue>头文件中
-* queue使用先进先出（FIFO）策略
-* priority_queue允许建立元素优先级，新元素根据优先级插入
-* 默认使用<运算符确定相对优先级
+* `queue`和`priority_queue`定义在`<queue>`头文件中
+* `queue`使用**先进先出**（FIFO）策略
+* `priority_queue`允许建立元素优先级，新元素根据优先级插入
+  * 例子：餐厅排队，但是每个人都有预定时间，根据预定时间入座
+* 默认使用`<`运算符确定相对优先级
 
 **注意点**
-* ⚠️ queue示例：按到达顺序入座的餐厅
-* ⚠️ priority_queue示例：按预约时间入座的餐厅
-* 💡 priority_queue的优先级可以通过自定义比较函数改变
+* ⚠️ `queue`示例：按到达顺序入座的餐厅
+* ⚠️ `priority_queue`示例：按预约时间入座的餐厅
+* 💡 `priority_queue`的优先级可以通过自定义比较函数改变
 
 ---
 
@@ -197,18 +198,18 @@ while (!intStack.empty()) {  // 栈中仍有值时
 ### ✅ 知识点3.1: 队列操作
 
 **理论**
-* 表9.19中列出的队列操作：
-  - `q.pop()`：移除但不返回队首元素（queue）或最高优先级元素（priority_queue）
-  - `q.front()`：返回但不移除queue的队首元素
-  - `q.back()`：返回但不移除queue的队尾元素（仅queue）
-  - `q.top()`：返回但不移除priority_queue的最高优先级元素（仅priority_queue）
-  - `q.push(item)`：在队尾创建元素（queue）或在适当位置创建元素（priority_queue）
-  - `q.emplace(args)`：通过args构造元素
+* 队列操作：
+  - `q.pop()`：移除但不返回队首元素（`queue`）或最高优先级元素（`priority_queue`）
+  - `q.front()`：返回但不移除`queue`的队首元素（仅`queue`）
+  - `q.back()`：返回但不移除`queue`的队尾元素（仅`queue`）
+  - `q.top()`：返回但不移除`priority_queue`的最高优先级元素（仅`priority_queue`）
+  - `q.push(item)`：在队尾创建元素（`queue`）或在适当位置创建元素（`priority_queue`）
+  - `q.emplace(args)`：通过`args`构造元素
 
 **注意点**
-* ⚠️ queue有front()和back()，priority_queue只有top()
-* ⚠️ 对空队列调用front()、back()、top()或pop()是未定义行为
-* 💡 priority_queue的push()会根据优先级自动调整元素位置
+* ⚠️ `queue`有`front()`和`back()`，`priority_queue`只有`top()`
+* ⚠️ 对空队列调用`front()`、`back()`、`top()`或`pop()`是未定义行为
+* 💡 `priority_queue`的`push()`会根据优先级自动调整元素位置
 
 ---
 
