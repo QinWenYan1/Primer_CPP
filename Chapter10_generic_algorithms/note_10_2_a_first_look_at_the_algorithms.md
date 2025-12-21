@@ -206,7 +206,7 @@ bool result = equal(vec1.cbegin(), vec1.cend(), vec2.cbegin());
 ---
 
 <a id="id8"></a>
-## ✅ 知识点6: fill 写元素算法
+## ✅ 知识点6: `fill` 写元素算法
 
 **理论**
 * `fill`算法将给定值赋给输入序列中的每个元素
@@ -234,7 +234,7 @@ fill(vec.begin(), vec.begin() + vec.size()/2, 10);
 ---
 
 <a id="id9"></a>
-## ✅ 知识点7: fill_n 写元素算法
+## ✅ 知识点7: `fill_n` 写元素算法
 
 **理论**
 * `fill_n`算法将给定值赋给从指定位置开始的指定数量的元素
