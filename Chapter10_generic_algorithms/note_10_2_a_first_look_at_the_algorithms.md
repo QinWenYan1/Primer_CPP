@@ -404,7 +404,7 @@ replace_copy(list.begin(), list.end(),
 ---
 
 <a id="id15"></a>
-## ✅ 知识点12: sort 重排算法
+## ✅ 知识点12: `sort`重排算法
 
 **理论**
 * `sort`算法对输入范围内的元素进行排序
@@ -464,7 +464,7 @@ auto end_unique = unique(words.begin(), words.end());
 ---
 
 <a id="id17"></a>
-### ✅ 知识点13.1: unique 算法的工作方式
+### ✅ 知识点13.1: `unique`算法的工作方式
 
 **理论**
 * `unique`不改变容器大小，只是重新排列元素
