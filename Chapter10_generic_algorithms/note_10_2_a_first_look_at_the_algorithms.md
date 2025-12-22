@@ -433,7 +433,7 @@ sort(words.begin(), words.end());
 ---
 
 <a id="id16"></a>
-## ✅ 知识点13: unique 重排算法
+## ✅ 知识点13: `unique` 重排算法
 
 **理论**
 * `unique`算法"消除"相邻的重复项
