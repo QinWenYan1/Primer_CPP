@@ -41,8 +41,7 @@ graph TD
 * [*知识点12: sort 重排算法*](#id15)：对序列进行排序的算法
 * [*知识点13: unique 重排算法*](#id16)：消除相邻重复元素的算法
     * [*知识点13.1: unique 算法的工作方式*](#id17)：unique实际不删除元素，而是覆盖相邻重复项
-* [*知识点14: 容器操作与算法配合*](#id18)：使用容器成员函数实际删除元素
-    * [*知识点14.1: 安全删除空范围*](#id19)：erase空范围操作的安全性
+    * [*知识点13.2: 安全删除空范围*](#id19)：erase空范围操作的安全性
 
 ---
 
@@ -438,8 +437,9 @@ sort(words.begin(), words.end());
 **理论**
 * `unique`算法"消除"相邻的重复项
 * 重新排列输入范围，使每个唯一元素出现在序列的前部
-* 返回指向最后一个唯一元素之后位置的迭代器
-* 容器大小不变，超出返回迭代器的元素的值是未指定的
+* 返回指向**最后一个唯一元素之后位置的迭代器**
+    * 也就是返回没有重复元素的部分
+* 容器**大小不变**，超出返回迭代器的元素的值是未指定的
 
 **教材示例代码**
 ```cpp
@@ -457,73 +457,38 @@ auto end_unique = unique(words.begin(), words.end());
 // words现在：fox, jumps, over, quick, red, slow, the, turtle, ???, ???
 ```
 
-**注意点**
-* ⚠️ `unique`实际上并不删除元素，只是覆盖相邻的重复项
-* 💡 序列必须已排序，`unique`才能正确工作（因为它只消除相邻的重复项）
-
 ---
 
 <a id="id17"></a>
 ### ✅ 知识点13.1: `unique`算法的工作方式
 
 **理论**
-* `unique`不改变容器大小，只是重新排列元素
-* 唯一的元素被移动到序列的前部
-* 返回的迭代器标记唯一元素范围的结束
-* 超出该迭代器的元素仍然存在，但值不确定
+* `unique`实际上并不删除元素，只是覆盖相邻的重复项
+    * 唯一的元素被移动到序列的前部
+* 返回的迭代器标记唯一元素范围的结束(尾后)
+    * 超出该迭代器的元素仍然存在，但值不确定
+* 需要配合容器操作`erase`等来实际删除多余的元素
 
-**注意点**
+
+**示意图**
 * 🔄 将`unique`的结果可视化：
   ```
   排序后：fox, jumps, over, quick, red, red, slow, the, the, turtle
   unique后：fox, jumps, over, quick, red, slow, the, turtle, ???, ???
-                   ↑
-            end_unique指向这里
+                                                            ↑
+                                                    end_unique指向这里
   ```
-* ⚠️ 需要配合容器操作来实际删除多余的元素
-
----
-
-<a id="id18"></a>
-## ✅ 知识点14: 容器操作与算法配合
-
-**理论**
-* 算法不能直接添加或删除容器元素
-* 要实际删除元素，必须使用容器操作
-* 通常先使用算法处理元素，然后使用容器成员函数删除不需要的元素
-
-**教材示例代码**
-```cpp
-#include <algorithm>
-#include <vector>
-#include <string>
-using namespace std;
-
-void elimDups(vector<string> &words) {
-    // 1. 排序使重复项相邻
-    sort(words.begin(), words.end());
-    
-    // 2. 重排，消除相邻重复项
-    auto end_unique = unique(words.begin(), words.end());
-    
-    // 3. 使用容器操作实际删除多余元素
-    words.erase(end_unique, words.end());
-}
-
-vector<string> words = {"the", "quick", "red", "fox", 
-                        "jumps", "over", "the", "slow", "red", "turtle"};
-elimDups(words);
-// words现在：fox, jumps, over, quick, red, slow, the, turtle
-```
 
 **注意点**
-* 🎯 这是算法和容器操作配合使用的典型模式
-* 💡 算法通过迭代器操作元素，容器操作管理容器本身的结构
+* 💡 序列必须已排序，`unique`才能正确工作（因为它只消除相邻的重复项）
+* ⚠️ 标准库算法操控迭代器而不是容器，不能直接删除添加元素
+
+
 
 ---
 
 <a id="id19"></a>
-### ✅ 知识点14.1: 安全删除空范围
+### ✅ 知识点13.2: 安全删除空范围
 
 **理论**
 * 即使容器中没有重复元素，`erase`操作也是安全的
