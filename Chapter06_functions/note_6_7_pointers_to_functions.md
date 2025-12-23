@@ -242,6 +242,9 @@ int (*f1(int))(int*, int);
 
 **教材示例代码**
 ```cpp
+// 直接声明（复杂）
+int (*f1(int))(int*, int);
+
 // 尾置返回类型简化
 auto f1(int) -> int (*)(int*, int);
 
@@ -252,6 +255,10 @@ string::size_type largerLength(const string&, const string&);
 // 根据字符串参数返回不同的函数指针
 decltype(sumLength) *getFcn(const string &);
 ```
+**代码解析**
+* 在 trailing return type 里，`auto`只是语法要求的“占位符”
+
+* 返回类型由 `->` 后面的类型 完全决定，没有任何推断发生
 
 **注意点**
 * ⚠️ `decltype(函数名)`返回函数类型，不是指针类型
