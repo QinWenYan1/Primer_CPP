@@ -341,10 +341,13 @@ for_each(words.begin(), words.end(),
 
 **理论**
 * 默认情况下，lambda不能改变按值捕获的变量的值
+    * **Lambda按值捕获的变量副本**默认是const的
 * 如果想改变捕获变量的值，必须在参数列表后加上`mutable`关键字
     * `mutable`关键字放在参数列表后，返回类型前
+    * `mutable`的作用是解除这个`const`限制以**允许修改捕获的副本**
+    * 但修改的是副本而非外部变量本身
 * 可变lambda**不能**省略参数列表
-* `mutable`关键字放在参数列表后，返回类型前
+
 
 **教材示例代码**
 ```cpp
@@ -396,12 +399,16 @@ transform(v1.begin(), v1.end(), v1.begin(),
 ---
 
 <a id="id12"></a>
-## ✅ 知识点3: 绑定参数bind函数
+## ✅ 知识点4: 绑定参数bind函数
 
 **理论**
-* `bind`函数是通用函数适配器，生成新的可调用对象
+* 使用谓词时，一般非常困难去使用普通函数替换lambda函数
+    * 因为一些算法直接受一元谓词，而lambda的捕获特征能解决这个问题
+* 我们也可以使用`bind`关键字（定义在`<functional>`头文件中）解决这个问题
+    * `bind`可以创建满足算法参数要求的可调用对象
+* `bind`函数是通用函数适配器，生成**新的可调用对象**
 * 主要用途：调整参数顺序、绑定固定参数值
-* 当需要在多个地方使用相同操作时，bind比重复写Lambda更合适
+* 当需要在多个地方使用相同操作时，`bind`比重复写Lambda更合适
 
 **教材示例代码**
 ```cpp
@@ -410,21 +417,18 @@ auto check6 = bind(check_size, _1, 6);
 bool b1 = check6("hello"); // 调用check_size("hello", 6)
 ```
 
-**注意点**
-* ⚠️ `bind`定义在`<functional>`头文件中
-* 💡 `bind`适合将多元函数适配为一元函数，用于需要一元谓词的算法
-* 🔄 `bind`返回的可调用对象可以存储和传递
-
 ---
 
 <a id="id13"></a>
-### ✅ 知识点3.1: bind基本用法
+### ✅ 知识点4.1: bind基本用法
 
 **理论**
 * `bind`调用形式：`auto newCallable = bind(callable, arg_list);`
-* `newCallable`是一个新的可调用对象
-* `arg_list`是逗号分隔的参数列表，对应原始可调用对象的参数
-* 参数可以是值、占位符或表达式
+    * `newCallable`是一个新的可调用对象
+    * 占位符`_n`表示`newCallable`的**第n个参数**
+    * `arg_list`是逗号分隔的**参数列表**，对应原始可调用对象的参数
+    * 当我们调用这个`newCallable`，`newCallable`就会调用`callable`并传入指定参数
+* 参数可以是**值、占位符**或**表达式**
 
 **教材示例代码**
 ```cpp
@@ -432,21 +436,33 @@ bool b1 = check6("hello"); // 调用check_size("hello", 6)
 auto wc = find_if(words.begin(), words.end(),
                   bind(check_size, _1, sz));
 ```
+**代码解析**
 
-**注意点**
-* ⚠️ `bind`的参数在绑定时求值并存储
-* 💡 `bind`可以创建满足算法参数要求的可调用对象
-* 🔄 对于简单操作，Lambda通常更直观；对于复杂操作或多处复用，bind更有优势
+* `bind(check_size, _1, sz)`生成了一个新函数
+* 这个新函数只接收1个参数（因为只有`_1`）
+* `_1`在这个`arg_list`的第一个位置
+* 也就是将这个参数传入到`check_size`的第一个参数
+* `6`在`arg_list`的第二个位置，也就是将这个6传递给`check_size`的第二个参数
+* 由于`check_size`接受的是一个`const string&`，所以`check6`接受的也是同类
+* 最后等效于:
+```cpp
+auto wc = find_if(words.begin(), words.end(),
+    [&](const string& word) {
+        return check_size(word, sz);
+    });
+```
+
 
 ---
 
 <a id="id14"></a>
-### ✅ 知识点3.2: 使用占位符
+### ✅ 知识点4.2: 使用占位符
 
 **理论**
-* 占位符`_n`表示`newCallable`的第n个参数
-* 占位符定义在`std::placeholders`命名空间中
-* 每个使用的占位符都需要单独的using声明或使用整个命名空间
+* 占位符定义在`std::placeholders`这个嵌套命名空间中
+* 占位符需要包含`<functional>`头文件
+* 每个使用的占位符都需要单独的`using`声明或使用整个命名空间
+    * `bind`会假设已经有了正确的`using`的声明
 
 **教材示例代码**
 ```cpp
@@ -461,14 +477,16 @@ auto g = bind(f, a, b, _2, c, _1);
 ```
 
 **注意点**
-* ⚠️ 占位符需要包含`<functional>`头文件
-* ⚠️ 占位符从`_1`开始，表示第一个参数
-* 💡 使用`using namespace std::placeholders;`可以避免为每个占位符单独声明
+* ⚠️ 为每个占位符单独声明太繁琐且没有容易出错
+    * 使用`using namespace std::placeholders;`
+    * 能一次性将所有`names`在`placeholders`的变为可使用的
+
+
 
 ---
 
 <a id="id15"></a>
-### ✅ 知识点3.3: 参数重排
+### ✅ 知识点4.3: 参数重排
 
 **理论**
 * `bind`可以重新排列参数顺序
