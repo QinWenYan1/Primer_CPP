@@ -432,25 +432,19 @@ bool b1 = check6("hello"); // 调用check_size("hello", 6)
 
 **教材示例代码**
 ```cpp
-// 绑定check_size的第二个参数为sz
-auto wc = find_if(words.begin(), words.end(),
-                  bind(check_size, _1, sz));
+// 使用占位符绑定参数
+auto g = bind(f, a, b, _2, c, _1);
 ```
 **代码解析**
 
-* `bind(check_size, _1, sz)`生成了一个新函数
-* 这个新函数只接收1个参数（因为只有`_1`）
-* `_1`在这个`arg_list`的第一个位置
-* 也就是将这个参数传入到`check_size`的第一个参数
-* `6`在`arg_list`的第二个位置，也就是将这个6传递给`check_size`的第二个参数
-* 由于`check_size`接受的是一个`const string&`，所以`check6`接受的也是同类
-* 最后等效于:
-```cpp
-auto wc = find_if(words.begin(), words.end(),
-    [&](const string& word) {
-        return check_size(word, sz);
-    });
-```
+
+1. `bind(f, a, b, _2, c, _1)` **按顺序决定 f 的 5 个参数来源**
+2. 固定值 `a、b、c` 直接塞进对应位置
+3. `_1、_2` 表示 **调用 g 时传入的第 1、2 个参数**
+4. `g(x, y)` 会把 `y` 放到 f 的第 3 个参数，把 `x` 放到第 5 个参数
+5. **最终等价效果：`g(x, y)` 调用 `f(a, b, y, c, x)`**
+
+
 
 
 ---
@@ -471,9 +465,6 @@ using std::placeholders::_1;
 
 // 或者使用整个命名空间
 using namespace std::placeholders;
-
-// 使用占位符绑定参数
-auto g = bind(f, a, b, _2, c, _1);
 ```
 
 **注意点**
@@ -490,31 +481,31 @@ auto g = bind(f, a, b, _2, c, _1);
 
 **理论**
 * `bind`可以重新排列参数顺序
+    * 并不是只有lambda才能用，可调用对象都可以
 * 通过调整占位符位置，可以改变参数传递顺序
-* 这在适配不同接口时特别有用
+* 这在**适配不同接口**时特别有用
+* 参数重排可以复用现有函数，**避免编写新函数**
 
 **教材示例代码**
 ```cpp
-// 原始调用：isShorter(a, b)返回a是否比b短
+// 原始调用：isShorter(a, b)返回a是否比b短，从短到长
+sort(words.begin(), words.end(), isShorter);
 // 使用bind反转参数：实现从长到短排序
 sort(words.begin(), words.end(), 
      bind(isShorter, _2, _1)); // 相当于isShorter(b, a)
 ```
 
-**注意点**
-* ⚠️ 参数重排需要仔细对应占位符位置
-* 💡 参数重排可以复用现有函数，避免编写新函数
-* 🔄 占位符的位置决定了`newCallable`参数如何映射到原始函数
 
 ---
 
 <a id="id16"></a>
-### ✅ 知识点3.4: 绑定引用参数
+### ✅ 知识点4.4: 绑定引用参数
 
 **理论**
-* 默认情况下，`bind`的参数被复制到返回的可调用对象中
+* 默认情况下，`bind`的参数被复制到新的可调用对象中
 * 对于不可复制的对象（如ostream），需要使用`ref`或`cref`函数
-* `ref`返回对象的引用包装，可以复制
+    * `ref`和`cref`也定义在`<functional>`头文件中
+* `ref`返回可复制的引用包装，`cref`就是返回指向`const`版本的
 
 **教材示例代码**
 ```cpp
@@ -528,9 +519,10 @@ for_each(words.begin(), words.end(),
 ```
 
 **注意点**
-* ⚠️ `ref`和`cref`也定义在`<functional>`头文件中
-* ⚠️ `ref`用于非const引用，`cref`用于const引用
-* 💡 当需要绑定不能复制的对象时，必须使用`ref`或`cref`
+* ⚠️ 早期 C++ 用 `bind1st / bind2nd` 绑定函数参数，但功能很受限、用法还复杂
+* ⚠️ 它们只能绑定第一个或第二个参数，因此已在新标准中被**弃用**，未来可能不再支持
+* ⚠️ **现代 C++ 应该使用 `std::bind`（或更推荐 lambda）来做参数绑定**
+
 
 ---
 
