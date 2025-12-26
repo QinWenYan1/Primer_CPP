@@ -98,8 +98,8 @@ copy(lst.cbegin(), lst.cend(), inserter(lst3, lst3.begin()));
     * `in1 == in2 / in1 != in2`
     👉 相等条件：
 
-    * 都是 end，或
-    * 绑定到同一个输入流
+        * 都是 end，或
+        * 绑定到同一个输入流
 
     * `*in`
     👉 返回**当前从流中读到的值**
@@ -155,10 +155,13 @@ while (in_iter != eof) // 读入数据到vector
     vec.push_back(*in_iter++);
 
 //我们还可以写出另一种相同功能的代码
+istream_iterator<int> in_iter(cin), eof; 
+vector<int> vec(in_iter, eof);
 
 ifstream in("afile");
 istream_iterator<string> str_it(in); // 从"afile"读取strings
 ```
+
 
 ---
 <a id="id4"></a>
@@ -198,6 +201,7 @@ cout << endl;
 istream_iterator<int> in(cin), eof;
 cout << accumulate(in, eof, 0) << endl;
 ```
+**代码解析**
 * 此调用将生成从标准输入读取的值的总和。
 
 ---
