@@ -9,6 +9,7 @@ Answer:
 5. 自由访问迭代器：支持++ --移动， 可以保存元素状态， 可以多次访问或写入一个元素， 支持迭代器之间的运算， 支持位置判断 == != 以及> < 符号
 
 Exercise 10.39: What kind of iterator does a list have? What about a
+Answer: 双向迭代器，因为 其迭代器可以对一个元素进行多次读取写入，可以判断位置是否相同， 并且也可以向前向后一个一个的移动，但是无法自由访问，所以用的是双向迭代器
 vector?
 Exercise 10.40: What kinds of iterators do you think copy requires? What
 about reverse or unique?
