@@ -202,43 +202,44 @@
 **理论**
 * **标准库的"命名哲学"**：看名字就知道这个算法怎么用。
 
-### 第一种：重载版本(Overloading to Pass a Predicate)
-* **适用于**：只需要替换比较方式的算法。
-* **例子**：
-  ```cpp
-  unique(begin, end);           // 默认用 `==` 比较
-  unique(begin, end, comp); // 用自定义比较函数(comparison function)比较
-  ```
-* **为什么能重载**：参数个数不同，编译器能分清。
+* **第一种：重载谓词版本(Overloading to Pass a Predicate)**
+  * **适用于**：只需要替换比较方式的算法。
+  * **例子**：
+    ```cpp
+    unique(begin, end);           // 默认用 `==` 比较
+    unique(begin, end, comp); // 用自定义比较函数(comparison function)比较
+    ```
+  * **为什么能重载**：参数个数不同，编译器能分清。
 
-### 第二种：加 `_if` 后缀(_if Versions)
-* **适用于**：把"具体值"换成"判断条件"(predicate)的算法。
-* **例子**：
-  ```cpp
-  find(begin, end, 42);         // 找数值42
-  find_if(begin, end, pred); // 找符合条件(predicate)的所有元素
-  ```
-* **为什么不重载**：两个版本参数个数相同，重载会混淆，所以用不同名字。
+* **第二种：加 `_if` 后缀(_if Versions)**
+  * **适用于**：把"具体值"换成"判断条件"(predicate)的算法
+  * **例子**：
+    ```cpp
+    find(begin, end, 42);         // 找第一个数值为42的元素
+    find_if(begin, end, pred); // 找符合条件(predicate)的第一个元素
+    ```
+  * `find_if`寻找第一个让`pred`返回非零的元素
+  * **为什么不重载**：两个版本参数个数相同，重载会混淆，所以用不同名字。
 
-### 第三种：加 `_copy` 后缀(Distinguishing Versions That Copy)
-* **适用于**：不想修改原数据，想要个副本。
-* **例子**：
-  ```cpp
-  reverse(begin, end);               // 原地反转
-  reverse_copy(begin, end, dest); // 反转后存到目标位置(destination)，原数据不变
-  ```
+* **第三种：加 `_copy` 后缀(Distinguishing Versions That Copy)**
+  * **适用于**：不想修改原数据，想要个副本。
+  * **例子**：
+    ```cpp
+    reverse(begin, end);               // 原地反转
+    reverse_copy(begin, end, dest); // 反转后存到目标位置(destination)，原数据不变
+    ```
 
-### 第四种：组合使用
-* **最灵活**：`_copy` 和 `_if` 可以组合。
-* **例子**：
-  ```cpp
-  // 从v1中删除所有奇数（直接修改v1）
-  remove_if(v1.begin(), v1.end(), [](int x){ return x % 2; });
-  
-  // 把v1中所有偶数复制到v2（v1不变）
-  remove_copy_if(v1.begin(), v1.end(), back_inserter(v2),
-                 [](int x){ return x % 2; });
-  ```
+* **第四种：组合使用**
+  * **最灵活**：`_copy` 和 `_if` 可以组合。
+  * **例子**：
+    ```cpp
+    // 从v1中删除所有奇数（直接修改v1）
+    remove_if(v1.begin(), v1.end(), [](int x){ return x % 2; });
+    
+    // 把v1中所有偶数复制到v2（v1不变）
+    remove_copy_if(v1.begin(), v1.end(), back_inserter(v2),
+                  [](int x){ return x % 2; });
+    ```
 
 **实用例子**
 ```cpp
