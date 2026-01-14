@@ -32,7 +32,9 @@
 ## ✅ 知识点1: 关联容器额外的类型别名
 
 **理论**
-* **核心主旨总结**：关联容器定义了几个额外的类型别名 (Type Aliases)，用以表示其键(key)和值(value)的类型。`key_type` 总是容器的键类型。对于 `map` 系列，`value_type` 是一个 `pair`，其 `first` 成员是 `const key_type`。
+* **核心主旨总结**：关联容器定义了几个额外的类型别名 (Type Aliases)，用以表示其键(key)和值(value)的类型。
+    * `key_type` 总是容器的键类型。
+    * 对于 `map` 系列，`value_type` 是一个 `pair`，其 `first` 成员是 `const key_type`。
 * **具体类型说明**：
     * `key_type`：此容器类型的键的类型。
     * `mapped_type`：每个键关联的值的类型；仅 `map` 类型有此定义。
@@ -51,7 +53,6 @@ map<string, int>::mapped_type v5;    // v5 is an int
 
 **注意点**
 * ⚠️ **`value_type` 对于 `map` 是一个 `pair`**，并且我们**不能改变元素的关键字(key)**，因此该 `pair` 的 `first` 成员是 `const`。
-* 📋 **术语提醒**：`mapped_type` 仅由 `map` 类型 (`unordered_map`, `unordered_multimap`, `multimap`, 和 `map`) 定义。
 
 ---
 
@@ -59,7 +60,8 @@ map<string, int>::mapped_type v5;    // v5 is an int
 ## ✅ 知识点2: 关联容器迭代器
 
 **理论**
-* **核心主旨总结**：解引用一个关联容器迭代器，会得到一个指向容器 `value_type` 的引用。对于 `map`，这意味着得到的是一个 `pair` 的引用，其 `first` 成员是 `const` 的键。
+* **核心主旨总结**：**解引用**一个关联容器迭代器，会得到一个指向容器 `value_type` 的**引用**。
+    * 对于 `map`，这意味着得到的是一个 `pair` 的引用，其 `first` 成员是 `const` 的键。
 * **访问限制**：可以通过迭代器修改 `map` 元素的值 (`second`)，但不能修改键 (`first`)。
 
 **教材示例代码**
