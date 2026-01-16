@@ -401,7 +401,7 @@ for (auto beg = authors.lower_bound(search_item),
 
 **理论**
 * **核心主旨总结**：
-    * 最直接的解决方案是使用 `equal_range` 函数。它接受一个键，返回一个迭代器 `pair`。
+    * 最直接的解决方案是使用 `equal_range` 函数。它接受一个键，返回一个**迭代器 `pair`**。
     * 如果键存在，`first` 成员指向第一个实例，`second` 成员指向最后一个实例之后的位置。
     * 如果未找到，两个迭代器都指向可插入该键的位置。
 * **本质**：`equal_range` 返回的 `pair` 的 `first` 成员等价于 `lower_bound` 的返回值，`second` 成员等价于 `upper_bound` 的返回值。
