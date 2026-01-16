@@ -249,10 +249,10 @@ authors.insert({"Barth, John", "Lost in the Funhouse"});
 **理论**
 * **核心主旨总结**：关联容器定义了三个版本的 `erase`。
 * **操作概览**：
-    * `c.erase(k)`：从 `c` 中删除每个关键字为 `k` 的元素。返回 `size_type` 类型的值，表示删除的元素数量。
-    * `c.erase(p)`：删除迭代器 `p` 指定的元素。`p` 必须指向 `c` 中的一个真实元素。返回一个指向 `p` 之后元素的迭代器。
+    * `c.erase(k)`：从 `c` 中删除每个**关键字**为 `k` 的元素。返回 `size_type` 类型的值，表示删除的元素数量。
+    * `c.erase(p)`：删除迭代器 `p` 指定的元素。`p` 必须指向 `c` 中的一个真实元素。返回一个指向 `p` **之后**元素的迭代器或`e.end()`。
     * `c.erase(b, e)`：删除迭代器对 `b` 和 `e` 所表示的范围中的元素。返回 `e`。
-* **注意**：对于键唯一的容器，`erase(k)` 的返回值总是 0 或 1。对于允许多键的容器，返回值可能大于 1。
+
 
 **教材示例代码**
 ```cpp
@@ -264,21 +264,31 @@ else cout << "oops: " << "removal_word" << " not found\n";
 auto cnt = authors.erase("Barth, John"); // 如果 authors 是 multimap，cnt 可能是 2
 ```
 
+**注意**
+
+* ⚠️ 对于键唯一的容器，`erase(k)` 的返回值总是 0 或 1。对于允许多键的容器，返回值可能大于 1。
+
 ---
 
 <a id="id11"></a>
 ## ✅ 知识点11: 对 map 进行下标操作
 
 **理论**
-* **核心主旨总结**：`map` 和 `unordered_map` 容器提供了下标运算符 `[]` 和对应的 `at` 函数。`set` 类型不支持下标，`multimap` 和 `unordered_multimap` 也不能下标，因为一个键可能对应多个值。
-* **下标行为**：与数组或 `vector` 不同，**对一个 `map` 使用下标时，如果关键字 `k` 不在 `map` 中，会创建一个关键字为 `k` 的新元素，并对其进行值初始化**。因此，只能对非 `const` 的 `map` 使用下标操作。
+* **核心主旨总结**：
+    * `map` 和 `unordered_map` 容器提供了下标运算符 `[]` 和对应的 `at` 函数。
+    * `set` 类型**不支持**下标，`multimap` 和 `unordered_multimap` 也**不能**下标，因为一个键可能对应多个值。
+* **下标行为**：
+    * 与数组或 `vector` 不同，**对一个 `map` 使用下标时，如果关键字 `k` 不在 `map` 中，会创建一个关键字为 `k` 的新元素，并对其进行值初始化**。
+    * 因此，只能对非 `const` 的 `map` 使用下标操作。
 * **操作步骤示例**：`word_count["Anna"] = 1;` 的执行步骤：
     1. 在 `word_count` 中搜索键为 `"Anna"` 的元素，未找到。
     2. 将一个新的键值对插入 `word_count`。键是 `const string` `"Anna"`，值是值初始化的（`size_t` 被初始化为 0）。
     3. 获取新插入的元素，并将其值赋为 1。
 
 **注意点**
-* ⚠️ **重要区别**：下标一个 `map` 返回的是 `mapped_type` 对象；而解引用一个 `map` 迭代器返回的是 `value_type` 对象（即一个 `pair`）。
+* ⚠️ **`map`下标与其他的重要区别**：
+    * 下标一个 `map` 返回的是 `mapped_type` 对象
+    * 而解引用一个 `map` 迭代器返回的是 `value_type` 对象（即一个 `pair`）
 
 ---
 
@@ -299,7 +309,7 @@ cout << word_count["Anna"]; // fetch the element and print it; prints 2
 ---
 
 <a id="id13"></a>
-## ✅ 知识点13: 访问元素 (find, count, etc.)
+## ✅ 知识点13: 访问元素 (`find`, `count`, etc.)
 
 **理论**
 * **核心主旨总结**：关联容器提供多种查找给定元素的方法。
@@ -329,7 +339,7 @@ if (word_count.find("foobar") == word_count.end())
 
 **注意点**
 * ⚠️ **`lower_bound` 和 `upper_bound` 不适用于无序容器**。
-* ⚠️ 下标和 `at` 操作仅适用于非 `const` 的 `map` 和 `unordered_map`。
+* ⚠️ 下标和 `at` 操作仅适用于**非 `const`** 的 `map` 和 `unordered_map`。
 
 ---
 
