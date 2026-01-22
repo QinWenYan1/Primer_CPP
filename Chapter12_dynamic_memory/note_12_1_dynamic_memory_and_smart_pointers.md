@@ -161,7 +161,7 @@ auto p6 = make_shared<vector<string>>(); // 指向动态分配的空vector<strin
 **理论**
 * **核心主旨总结**：
     * 每个`shared_ptr`都会记录有多少其他`shared_ptr`指向同一个对象
-    * 每个`shared_ptr`都有一个关联的计数器，称为**引用计数(reference count)**。
+    * 每个`shared_ptr`所指向的内存都有一个关联的计数器，称为**引用计数(reference count)**。
 * **拷贝或赋值`shared_ptr`时，引用计数递增**（例如，初始化另一个`shared_ptr`、作为赋值右值、传参或返回值，因为有拷贝发生）。
 * **当给`shared_ptr`赋新值或`shared_ptr`本身被销毁时（如离开作用域），其引用计数递减**。
 * **一旦某个`shared_ptr`的引用计数变为0，它会自动释放所管理的对象**。
@@ -554,6 +554,7 @@ shared_ptr<int> clone(int p) {
 **理论**
 * **核心主旨总结**：
     * `shared_ptr`只能与其他作为自身副本的`shared_ptr`协调销毁。
+    * 内置指针无法和`shared_ptr`一起参与counter，即使两者都共同指向同一内存
     * **使用`make_shared`可以避免无意中将同一块内存绑定到多个独立创建的`shared_ptr`上**。
 * 当我们将一个`shared_ptr`绑定到一个普通指针时，我们就将管理该内存的责任交给了那个`shared_ptr`。
     * **一旦将责任交给`shared_ptr`，就不应该再使用内置指针来访问`shared_ptr`现在所指向的内存**。
@@ -582,6 +583,8 @@ int j = *x; // 未定义：x是悬挂指针！
 * 如危险用法中的`process`所示：
     * 虽然不能将内置指针传递给期望`shared_ptr`的函数，但可以传递一个（临时的）由内置指针显式构造的`shared_ptr`。
     * 然而，这样做很可能导致错误，因为临时`shared_ptr`在`process`函数执行结束被销毁后。
+    * 而当时的初始化的`shared_ptr`也不会因为还有一个内置指针而将counter提高为2。 
+    * 因此`shared_ptr`指向的内存也会被销毁。
     * 原始内置指针会变成悬挂指针。
 
 **注意点**
@@ -621,7 +624,7 @@ int foo = *p; // 未定义：p指向的内存已被释放
 ---
 
 <a id="id17"></a>
-## ✅ 知识点17: `shared_ptr`的其他操作（reset与unique）
+## ✅ 知识点17: `shared_ptr`的其他操作（`reset`与`unique`）
 
 **理论**
 * **核心主旨总结**：
