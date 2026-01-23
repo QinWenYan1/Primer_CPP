@@ -849,11 +849,16 @@ void f(destination &d /* other needed parameters */) {
 ---
 
 <a id="id23"></a>
-## ✅ 知识点23: weak_ptr 弱引用
+## ✅ 知识点23: `weak_ptr` 弱引用
 
 **理论**
-* **核心主旨总结**：**`weak_ptr`是一种不控制所指向对象生存期的智能指针**。它指向一个由`shared_ptr`管理的对象。将一个`weak_ptr`绑定到一个`shared_ptr`**不会改变`shared_ptr`的引用计数**。一旦最后一个指向对象的`shared_ptr`被销毁，对象就会被释放，即使仍有`weak_ptr`指向它——因此得名“弱”共享。
-* **不能直接使用`weak_ptr`访问其对象**，必须调用`lock()`。`lock()`检查`weak_ptr`指向的对象是否仍存在。若存在，则返回一个指向该共享对象的`shared_ptr`，从而保证底层对象在该`shared_ptr`存在期间至少存在。
+* **核心主旨总结**：
+    * **`weak_ptr`是一种不控制所指向对象生存期的智能指针**。
+    * 它指向一个由`shared_ptr`管理的对象。将一个`weak_ptr`绑定到一个`shared_ptr`**不会改变`shared_ptr`的引用计数**。
+    * 一旦最后一个指向对象的`shared_ptr`被销毁，对象就会被释放，即使仍有`weak_ptr`指向它——因此得名“弱”共享。
+* **不能直接使用`weak_ptr`访问其对象**，必须调用`lock()`。
+    * `lock()`检查`weak_ptr`指向的对象是否仍存在。
+    * 若存在，则返回一个指向该共享对象的`shared_ptr`，从而保证底层对象在该`shared_ptr`存在期间至少存在。
 
 **教材示例代码**
 ```cpp
@@ -872,7 +877,7 @@ if (shared_ptr<int> np = wp.lock()) { // 如果np不为null则为true
 ---
 
 <a id="id24"></a>
-## ✅ 知识点24: 使用 weak_ptr 的示例 - StrBlobPtr
+## ✅ 知识点24: 使用`weak_ptr`的示例 - StrBlobPtr
 
 **理论**
 * **核心主旨总结**：作为`weak_ptr`用途的示例，教材定义了一个`StrBlob`的伴随指针类`StrBlobPtr`。它存储一个指向`StrBlob`数据成员的`weak_ptr`。通过使用`weak_ptr`，它不影响所指向`vector`的生存期，但可以防止用户尝试访问一个不存在的`vector`。
