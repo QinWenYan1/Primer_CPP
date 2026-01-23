@@ -890,12 +890,18 @@ if (shared_ptr<int> np = wp.lock()) { // 如果np不为null则为true
 ---
 
 <a id="id24"></a>
-## ✅ 知识点24: 使用`weak_ptr`的示例 - StrBlobPtr
+## ✅ 知识点24: 使用`weak_ptr`的示例 - `StrBlobPtr`
 
 **理论**
-* **核心主旨总结**：作为`weak_ptr`用途的示例，教材定义了一个`StrBlob`的伴随指针类`StrBlobPtr`。它存储一个指向`StrBlob`数据成员的`weak_ptr`。通过使用`weak_ptr`，它不影响所指向`vector`的生存期，但可以防止用户尝试访问一个不存在的`vector`。
-* `StrBlobPtr`有两个数据成员：`wptr`（指向`StrBlob`中`vector`的`weak_ptr`）和`curr`（当前指示元素的索引）。它有一个`check`成员来验证解引用是否安全，该`check`使用`lock()`来获取`shared_ptr`，如果底层`vector`已被释放则抛出异常。
-* `StrBlobPtr`类提供了`deref()`和`incr()`成员来模拟指针的解引用和递增操作。`StrBlob`类需要将`StrBlobPtr`声明为友元，并添加`begin()`和`end()`成员返回指向自身的`StrBlobPtr`。
+* **核心主旨总结**：
+    * 作为`weak_ptr`用途的示例，教材定义了一个`StrBlob`的伴随指针类`StrBlobPtr`。
+    * 它存储一个指向`StrBlob`数据成员的`weak_ptr`。
+    * 通过使用`weak_ptr`，它不影响所指向`vector`的生存期，但可以防止用户尝试访问一个不存在的`vector`。
+* `StrBlobPtr`有两个数据成员：
+    * `wptr`（指向`StrBlob`中`vector`的`weak_ptr`）
+    * 和`curr`（当前指示元素的索引）。它有一个`check`成员来验证解引用是否安全，该`check`使用`lock()`来获取`shared_ptr`，如果底层`vector`已被释放则抛出异常。
+* `StrBlobPtr`类提供了`deref()`和`incr()`成员来模拟指针的解引用和递增操作。
+    * `StrBlob`类需要将`StrBlobPtr`声明为友元，并添加`begin()`和`end()`成员返回指向自身的`StrBlobPtr`。
 
 **教材示例代码**
 ```cpp
@@ -943,7 +949,8 @@ class StrBlob {
 ```
 
 **注意点**
-* 🔧 **设计模式**：`StrBlobPtr`是一个“智能”迭代器或指针类，它使用`weak_ptr`来安全地引用可能已被销毁的共享数据。
+* 🔧 **设计模式**：
+    * `StrBlobPtr`是一个“智能”迭代器或指针类，它使用`weak_ptr`来安全地引用可能已被销毁的共享数据。
 * ⚠️ **构造函数限制**：`StrBlobPtr`的构造函数接受非const的`StrBlob&`引用，因此**不能将`StrBlobPtr`绑定到const `StrBlob`对象**。
 * 💡 **`weak_ptr`的典型应用**：`StrBlobPtr`展示了`weak_ptr`在创建不拥有资源、但需要安全地检查资源是否存在的“观察者”类时的典型用法。
 
