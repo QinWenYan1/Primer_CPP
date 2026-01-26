@@ -73,10 +73,13 @@ int *p = new arrT;    // allocates an array of 42 ints; p points to the first on
     * 即使使用数组类型别名，`new`也不会分配数组类型的对象。
 * **关键后果**：
     * 因为分配的内存没有数组类型，所以我们**不能**在动态数组上调用`begin()`或`end()`。这些函数需要使用数组维度（数组类型的一部分）。
-    * 同样原因，我们也**不能**使用**范围for循环(range for)**来处理所谓的动态数组的元素。
+    * 同样原因，我们也**不能**使用<b>范围for循环(range for)</b>来处理所谓的动态数组的元素。
 
 **注意点**
-* 💡 **理解技巧**：这是理解动态数组行为的关键点。`new int[10]`返回的是`int*`，而不是`int[10]`。这使得动态数组在许多方面与普通数组不同。
+* 💡 **理解技巧**：
+    * 这是理解动态数组行为的关键点。`new int[10]`返回的是`int*`，而不是`int[10]`。
+    * 这使得动态数组在许多方面与普通数组不同。
+    * 所谓的“动态数组”本质上只是一个指向内存的指针，它并**不具备**原生数组那种包含**长度信息**的“数组类型”身份。
 
 ---
 
@@ -84,12 +87,15 @@ int *p = new arrT;    // allocates an array of 42 ints; p points to the first on
 ## ✅ 知识点4: 动态分配数组的初始化
 
 **理论**
-* **核心主旨总结**：默认情况下，由`new`分配的对象（无论是单个对象还是数组）都是**默认初始化(default-initialized)**。可以通过在大小后跟一对空括号来对数组元素进行**值初始化(value-initialize)**。在新标准下，还可以提供初始化器列表。
+* **核心主旨总结**：
+    * 默认情况下，由`new`分配的对象（无论是单个对象还是数组）都是**默认初始化(default-initialized)**。
+    * 可以通过在大小后跟一对空括号来对数组元素进行**值初始化(value-initialize)**。
+    * 在新标准下，还可以提供初始化器列表。
 * **关键要点**：
     * 如果初始化器数量少于元素数量，剩余元素将被值初始化。
-    * 如果初始化器数量多于给定大小，则`new`表达式失败，不分配存储，并抛出一个类型为`bad_array_new_length`的异常。该类型定义在头文件`<new>`中。
+    * 如果初始化器数量多于给定大小，则`new`表达式**失败**，**不分配存储**，并抛出一个类型为`bad_array_new_length`的异常。该类型定义在头文件`<new>`中。
     * **不能**在用于值初始化的空括号内提供元素初始化器，这意味着**不能使用`auto`来分配数组**。
-* **术语提醒**：默认初始化(default-initialized)、值初始化(value-initialized)、初始化器列表(initializer list)、异常(exception)。
+
 
 **教材示例代码**
 ```cpp
@@ -102,6 +108,9 @@ string *psa2 = new string[10](); // block of ten empty strings
 int *pia3 = new int[10]{0,1,2,3,4,5,6,7,8,9};
 string *psa3 = new string[10]{"a", "an", "the", string(3,'x')};
 // 前四个用给定初始化器初始化，剩余元素值初始化
+auto p = new auto[10];   // 错误：编译器不知道该推导成什么类型
+auto p = new auto[10](); // 错误：虽然有括号，但括号内必须为空，编译器还是没法猜
+auto p = new auto(42); // 正确：编译器看到 42，知道 auto 应该是 int，p 是 int*
 ```
 
 ---
@@ -110,26 +119,25 @@ string *psa3 = new string[10]{"a", "an", "the", string(3,'x')};
 ## ✅ 知识点5: 动态分配空数组的合法性
 
 **理论**
-* **核心主旨总结**：允许使用`new`分配大小为0的数组，这是合法的，尽管不能定义长度为0的数组变量。
+* **核心主旨总结**：
+    * 允许使用`new`分配大小为0的数组，这是合法的，尽管不能定义长度为0的数组变量。
 * **关键行为**：
     * 当用`new`分配大小为0的数组时，`new`返回一个有效的、非零的指针。该指针保证与`new`返回的任何其他指针都不同。
     * 该指针的作用类似于零元素数组的**尾后指针(off-the-end pointer)** 或迭代器。
     * 可以对该指针进行比较、加减零以及自身相减（得到0）。
     * **该指针不能被解引用(dereferenced)**，因为它不指向任何元素。
-* **术语提醒**：尾后指针(off-the-end pointer)、解引用(dereferenced)。
+
 
 **教材示例代码**
 ```cpp
-char arr[0];           // error: cannot define a zero-length array
-char *cp = new char[0]; // ok: but cp can't be dereferenced
+char arr[0];           // 错误: 无法定义一个length为0的array
+char *cp = new char[0]; // ok: 但是无法解引用
 
-size_t n = get_size(); // get_size could return 0
-int* p = new int[n];   // ok even if n is 0
-for (int* q = p; q != p + n; ++q) { /* process the array */ } // loop body skipped if n==0
+size_t n = get_size(); 
+int* p = new int[n];   // 可行即使n为0
+for (int* q = p; q != p + n; ++q) { /* process the array */ } // 循环体直接被跳过
 ```
 
-**注意点**
-* 💡 **理解技巧**：这种特性使得处理可能返回0大小的函数时，代码无需特殊处理边界情况，循环会自然跳过。
 
 ---
 
@@ -137,12 +145,13 @@ for (int* q = p; q != p + n; ++q) { /* process the array */ } // loop body skipp
 ## ✅ 知识点6: 释放动态数组
 
 **理论**
-* **核心主旨总结**：为了释放动态数组，必须使用`delete`的一种特殊形式，即包含一对方括号：`delete [] pa;`。数组元素以逆序销毁。
+* **核心主旨总结**：
+    * 为了释放动态数组，必须使用`delete`的一种特殊形式，即包含一对方括号：`delete [] pa;`。
+    * 数组元素以逆序销毁（从后往前）。
 * **关键要点**：
-    * 空方括号对是必不可少的，它告诉编译器该指针指向一个对象数组的第一个元素。
-    * **警告(Warning)**：如果对指向数组的指针`delete`时省略了方括号，或者对指向单个对象的指针`delete`时使用了方括号，其**行为是未定义的(undefined behavior)**。编译器不太可能发出警告，但程序可能在运行时出错。
+    * 空方括号对是**必不可少的**，它告诉编译器该指针指向一个**对象数组**的第一个元素。
     * 即使使用类型别名分配数组时省略了`new`后的方括号，`delete`时也必须使用方括号。
-* **术语提醒**：未定义行为(undefined behavior)。
+
 
 **教材示例代码**
 ```cpp
@@ -153,6 +162,9 @@ typedef int arrT[42];
 int *p = new arrT; // allocates an array of 42 ints
 delete [] p;       // brackets are necessary because we allocated an array
 ```
+**注意点**：
+   * ⚠️ 如果对指向数组的指针`delete`时省略了方括号，或者对指向单个对象的指针`delete`时使用了方括号，其**行为是未定义的(undefined behavior)**。
+   * ⚠️ 编译器不太可能发出警告，但程序可能在运行时出错。
 
 ---
 
