@@ -172,11 +172,27 @@ delete [] p;       // brackets are necessary because we allocated an array
 ## ✅ 知识点7: 智能指针与动态数组
 
 **理论**
-* **核心主旨总结**：标准库提供了可以管理由`new`分配的数组的`unique_ptr`版本。`shared_ptr`不直接支持管理动态数组，如果要用，必须提供自定义的**删除器(deleter)**。
+* **核心主旨总结**：
+    * 标准库提供了可以管理由`new`分配的数组的`unique_ptr`版本。
+    * `shared_ptr`不直接支持管理动态数组，如果要用，必须提供自定义的**删除器(deleter)**。
 * **关键要点**：
-    * **`unique_ptr`管理数组**：必须在对象类型后包含一对空括号（如`unique_ptr<int[]>`）。指向数组的`unique_ptr`不支持点(`.`)和箭头(`->`)成员访问运算符，但支持**下标运算符(subscript operator) `[]`** 来访问数组元素。当其释放指针时，会自动使用`delete[]`。
-    * **`shared_ptr`管理数组**：不直接支持。必须提供自定义删除器（例如一个使用`delete[]`的lambda表达式）。`shared_ptr`没有下标运算符，也不支持指针算术，因此要访问元素，必须使用`.get()`获取内置指针，然后按常规方式使用。
-* **术语提醒**：删除器(deleter)、下标运算符(subscript operator)、内置指针(built-in pointer)。
+    * **`unique_ptr`管理数组**：
+        * 类型说明符中`<int[]>`表示`unique_ptr`指向一个ints数组
+        * 指向数组的`unique_ptr`**不支持**点(`.`)和箭头(`->`)成员访问运算符，但支持**下标运算符(subscript operator) `[]`** 来访问数组元素。
+        * 当其释放指针时，会自动使用`delete[]`。
+    * **`shared_ptr`管理数组**：
+        * **不直接支持**。必须提供自定义删除器（例如一个使用`delete[]`的lambda表达式）。
+        * 不传入的话会直接调用`delete`而不是`delete[]`，从而造成问题
+        * `shared_ptr`没有下标运算符，也不支持指针算术，因此要访问元素，必须使用`.get()`获取内置指针，然后按常规方式使用。
+* **指向数组的`unique_ptr`的特殊操作**
+
+    | 操作 | 功能描述 |
+    | --- | --- |
+    | **`unique_ptr<T[]> u`** | 声明一个空的智能指针 `u`，它可以指向一个类型为 `T` 的动态分配数组。 |
+    | **`unique_ptr<T[]> u(p)`** | 让 `u` 指向内置指针 `p` 所指向的动态数组。`p` 必须能转换成 `T*` 类型。 |
+    | **`u[i]`** | **核心操作**：返回数组中位置 `i` 处的对象。这让你像使用普通数组一样使用智能指针。 |
+
+---
 
 **教材示例代码**
 ```cpp
@@ -202,7 +218,7 @@ sp.reset(); // uses the lambda we supplied that uses delete[] to free the array
 ---
 
 <a id="id8"></a>
-## ✅ 知识点8: allocator类概述
+## ✅ 知识点8: `allocator`类概述
 
 **理论**
 * **核心主旨总结**：`new`将内存分配与对象构造结合在一起，`delete`将对象析构与内存释放结合在一起。这种结合有时不够灵活或效率低下（例如，可能创建从未使用的对象，或者对没有默认构造函数的类无法动态分配数组）。`allocator`类允许我们将**内存分配(allocation)**与**对象构造(construction)**分离开来。
