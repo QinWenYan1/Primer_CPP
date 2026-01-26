@@ -4,20 +4,6 @@
 
 ---
 
-## 🗺️ 知识体系图
-
-```mermaid
-graph TD
-    A[string Streams] --> B[istringstream]
-    A --> C[ostringstream]
-    A --> D[stringstream]
-    B --> B1[读取字符串]
-    C --> C1[写入字符串]
-    D --> D1[读写字符串]
-    E[具体应用] --> F[行处理]
-    E --> G[数据验证]
-    E --> H[格式化输出]
-```
 
 ## 🧠 核心概念总览
 
