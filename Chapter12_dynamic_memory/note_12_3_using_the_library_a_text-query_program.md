@@ -98,7 +98,7 @@
 ## ✅ 知识点6: TextQuery 类使用示例
 
 **理论**
-* **核心主旨总结**：在设计类之前，先编写使用该类的程序有助于验证类是否提供了所需的功能。
+* **核心主旨总结**：在设计类之前，**先编写使用该类的程序有助于验证类是否提供了所需的功能**。
 * **`runQueries` 函数示例**：该函数展示了如何使用`TextQuery`和`QueryResult`类。它接受一个指向待处理文件的`ifstream`，与用户交互，并打印对给定单词的查询结果。
 
 **教材示例代码**
@@ -119,12 +119,7 @@ void runQueries(ifstream &infile)
 }
 ```
 
-**注意点**
-* ⚠️ **循环控制**：`while (true)` 创建一个无限循环，通过内部的 `break` 语句退出。
-* 🔄 **程序流程**：首先初始化`TextQuery`对象（构造函数会读取文件并构建`map`），然后进入交互循环。用户每次输入一个单词，程序调用`tq.query(s)`进行查询，并通过`print`函数打印`QueryResult`结果。
 
-**补充内容**
-* 📋 **关于练习题**：教材在本知识点后列出了三个练习题（Exercise 12.27, 12.28, 12.29），内容涉及类的实现、不使用类的版本重写以及循环结构的改写。根据指南要求，这些练习题目被排除在笔记的详细记录之外。
 
 ---
 
@@ -132,7 +127,9 @@ void runQueries(ifstream &infile)
 ## ✅ 知识点7: TextQuery 类的定义
 
 **理论**
-* **核心主旨总结**：开始定义`TextQuery`类。用户通过提供一个`istream`来创建对象。类提供`query`操作，接收一个`string`并返回代表该字符串出现行的`QueryResult`对象。
+* **核心主旨总结**：
+    * 开始定义`TextQuery`类。用户通过提供一个`istream`来创建对象。
+    * 类提供`query`操作，接收一个`string`并返回代表该字符串出现行的`QueryResult`对象。
 * **数据成员设计**：考虑到与`QueryResult`对象的共享需求，类包含两个数据成员：
     1.  `shared_ptr<vector<string>> file`：指向动态分配的`vector`，保存输入文件。
     2.  `map<string, shared_ptr<set<line_no>>> wm`：将每个单词映射到一个动态分配的、存储其行号（`line_no`类型）的`set`。
@@ -156,12 +153,12 @@ private:
 **注意点**
 * ⚠️ **前向声明**：因为`query`成员函数的返回类型是`QueryResult`，所以需要在`TextQuery`类定义之前对`QueryResult`类进行前向声明。
 * 📋 **类型别名**：`using line_no = ...` 是C++11引入的类型别名语法，等价于 `typedef`。
-* 🔧 **复杂类型简化**：`wm` 的类型 `std::map<std::string, std::shared_ptr<std::set<line_no>>>` 非常复杂。为了便于阅读，可以在类内部使用类型别名或在实现文件中使用`using`指令来简化书写。
+
 
 ---
 
 <a id="id8"></a>
-## ✅ 知识点8: TextQuery 构造函数的实现
+## ✅ 知识点8: `TextQuery` 构造函数的实现
 
 **理论**
 * **核心主旨总结**：`TextQuery`构造函数接收一个`ifstream`，逐行读取输入文件，填充`file`和`wm`。
