@@ -119,6 +119,10 @@ Sales_data::Sales_data(const Sales_data &orig) :
     2. 从一个返回类型为**非引用**的函数返回对象。
     3. 用花括号列表初始化数组元素或聚合类成员。
     4. 某些类（如标准库容器）在初始化其元素或调用`insert`/`push`操作时。
+        * 相反`emplace`使用的是直接初始化
+* **拷贝初始化不一定用拷贝构造函数**：
+    * 拷贝初始化通常调用拷贝构造函数，但在支持移动操作的类下也可能调用移动构造函数 § 13.6.2。
+    * 因此拷贝初始化要求类必须定义这两者之一。 
 
 **教材示例代码**
 ```cpp
@@ -164,6 +168,10 @@ f(10); // error: can’t use an explicit constructor to copy an argument
 f(vector<int>(10)); // ok: directly construct a temporary vector from an int
 ```
 
+**代码解析**
+* `v2`报错是因为`vector`的只接受一个表示大小的参数构造函数是`explicit`
+* 为了使用这个构造函数， 我们必须显式申明
+
 ---
 
 <a id="id7"></a>
@@ -171,7 +179,7 @@ f(vector<int>(10)); // ok: directly construct a temporary vector from an int
 
 **理论**
 * **核心主旨总结**：
-    * 在拷贝初始化过程中，编译器被允许（但非必须）<b>跳过(skip)</b>拷贝/移动构造函数，直接创建对象。
+    * 在拷贝初始化过程中，编译器被允许（但非必须）<b>跳过</b>拷贝/移动构造函数，直接创建对象。
 * **重要限制**：**即使编译器省略了拷贝/移动构造函数的调用，该拷贝/移动构造函数也必须存在且可访问**（例如，不能是`private`的）。
 
 **教材示例代码**
