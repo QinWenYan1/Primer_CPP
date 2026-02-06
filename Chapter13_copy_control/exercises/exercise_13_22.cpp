@@ -58,6 +58,7 @@ HasPtr& HasPtr::operator= (const HasPtr& rhs){
     
     // 5. 返回当前对象的引用
     return *this;
+    
 }
 
 
