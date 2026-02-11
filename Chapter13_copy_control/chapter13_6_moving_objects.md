@@ -1,0 +1,578 @@
+# 📘 13.6 移动对象 (Moving Objects)
+
+> 来源说明：[C++ Primer 5th] 章节 13.6 | 本节涵盖：移动语义的背景、右值引用、移动构造函数与移动赋值运算符、合成移动操作、移动迭代器以及引用限定符成员函数。
+
+---
+
+## 🧠 核心概念总览（严格按原文顺序）
+
+* [*知识点1: 移动而非拷贝的动机*](#id1)
+* [*知识点2: 13.6.1 右值引用*](#id2)
+* [*知识点3: 左值持久；右值短暂*](#id3)
+* [*知识点4: 变量是左值*](#id4)
+* [*知识点5: 库函数 move*](#id5)
+* [*知识点6: 13.6.2 移动构造函数与移动赋值运算符*](#id6)
+* [*知识点7: StrVec 移动构造函数*](#id7)
+* [*知识点8: 移动操作、库容器与异常*](#id8)
+* [*知识点9: 移动赋值运算符*](#id9)
+* [*知识点10: 移后源对象必须可析构*](#id10)
+* [*知识点11: 合成的移动操作*](#id11)
+* [*知识点12: 若无移动构造函数，右值也被拷贝*](#id12)
+* [*知识点13: 拷贝并交换赋值运算符与移动*](#id13)
+* [*知识点14: Message 类的移动操作*](#id14)
+* [*知识点15: 移动迭代器*](#id15)
+* [*知识点16: 提供拷贝和移动版本的成员函数*](#id16)
+* [*知识点17: 右值和左值引用成员函数*](#id17)
+* [*知识点18: 重载与引用限定符*](#id18)
+
+---
+
+<a id="id1"></a>
+## ✅ 知识点1: 移动而非拷贝的动机
+
+**理论**
+* **核心主旨总结**：新标准引入了**移动对象(move object)**的能力，而非总是拷贝。两种主要场景下移动极具价值：
+  1. **性能提升**：某些情况下对象被拷贝后立即销毁（如 `StrVec` 重新分配），移动避免不必要的资源分配与释放。
+  2. **不可拷贝但可移动的类型**：如 **IO 类**和 **`unique_ptr`**，它们拥有不可共享的资源（指针或 IO 缓冲），因此不能被拷贝，但可以移动。
+* 在旧标准中无法直接移动，即使不必要也必须拷贝；大对象或需要内存分配的对象（如 `string`）拷贝开销昂贵。新标准允许将**仅可移动(move-only)** 的类型存入容器。
+
+**教材示例代码**  
+本节无独立代码块。
+
+**注意点**
+* 📋 **术语提醒**：**移动语义(move semantics)**、**仅可移动类型(move-only type)**。
+* ⚠️ **警告注意**：并非所有类型都可移动，某些类（如 IO、`unique_ptr`）可移动但不可拷贝。
+
+---
+
+<a id="id2"></a>
+## ✅ 知识点2: 13.6.1 右值引用 (Rvalue References)
+
+**理论**
+* **核心主旨总结**：新标准引入**右值引用(rvalue reference)**，通过 `&&` 获得，必须绑定到**右值(rvalue)**。右值引用的关键性质：**只能绑定到即将被销毁的对象**，因此可以自由地从该对象“移动”资源。
+* **左值(lvalue)与右值(rvalue)**：左值表达式表示对象的**身份(identity)**，右值表达式表示对象的**值(value)**。
+* **绑定规则对比**：
+  - **左值引用(lvalue reference)**（常规引用）不能绑定到要求转换的表达式、字面常量或返回右值的表达式。
+  - **右值引用**可以绑定到这类表达式，但不能直接绑定到左值。
+* **返回左值的表达式**：返回左值引用的函数、赋值、下标、解引用、前置递增/递减。可绑定左值引用。
+* **返回右值的表达式**：返回非引用类型的函数、算术、关系、位运算、后置递增/递减。可绑定 `const` 左值引用或右值引用。
+
+**教材示例代码**
+```cpp
+int i = 42;
+int &r = i;                // ok: r refers to i
+int &&rr = i;             // error: cannot bind an rvalue reference to an lvalue
+int &r2 = i * 42;        // error: i * 42 is an rvalue
+const int &r3 = i * 42;  // ok: we can bind a reference to const to an rvalue
+int &&rr2 = i * 42;      // ok: bind rr2 to the result of the multiplication
+```
+
+**注意点**
+* 📋 **术语提醒**：**右值引用(rvalue reference, &&)**，**左值引用(lvalue reference, &)**。
+* ⚠️ **警告注意**：右值引用只能绑定到右值，不能绑定到左值。
+
+---
+
+<a id="id3"></a>
+## ✅ 知识点3: 左值持久；右值短暂 (Lvalues Persist; Rvalues Are Ephemeral)
+
+**理论**
+* **核心主旨总结**：左值与右值的本质区别：**左值具有持久状态**，**右值是字面常量或求值过程中创建的临时对象**，即将被销毁。
+* 右值引用绑定到临时对象意味着：
+  - 被引用的对象**即将被销毁**。
+  - 该对象**没有其他用户**。
+* 因此，使用右值引用的代码可以自由地**接管(take over)** 该对象的资源。
+
+**教材示例代码**  
+本节无独立代码块。
+
+**注意点**
+* 💡 **理解技巧**：右值引用是“窃取”资源的通行证。
+* 📋 **术语提醒**：**临时对象(temporary object)**。
+
+---
+
+<a id="id4"></a>
+## ✅ 知识点4: 变量是左值 (Variables Are Lvalues)
+
+**理论**
+* **核心主旨总结**：变量是表达式，且属于左值。即使变量被定义为右值引用类型，该变量本身的表达式仍然是左值。因此，**不能将右值引用直接绑定到一个变量**（即使是右值引用变量）。
+
+**教材示例代码**
+```cpp
+int &&rr1 = 42;  // ok: literals are rvalues
+int &&rr2 = rr1; // error: the expression rr1 is an lvalue!
+```
+
+**注意点**
+* ⚠️ **警告注意**：变量是左值，不能将右值引用绑定到变量。
+* 💡 **理解技巧**：变量有名字，可以多次使用，因此是左值。
+
+---
+
+<a id="id5"></a>
+## ✅ 知识点5: 库函数 move (The Library move Function)
+
+**理论**
+* **核心主旨总结**：虽然不能直接将右值引用绑定到左值，但可以**显式地将左值转换为对应的右值引用类型**。标准库函数 `std::move`（定义在 `<utility>` 头文件）完成此转换，返回给定对象的右值引用。
+* **调用 `move` 的承诺**：除了对移后源对象进行**赋值**或**销毁**外，不再使用它。**不能对移后源对象的值做任何假设**。
+* 与多数标准库名字不同，**通常不为 `move` 提供 `using` 声明**，而是直接使用 `std::move`，以避免潜在的名字冲突（原因见 §18.2.3）。
+
+**教材示例代码**
+```cpp
+int &&rr3 = std::move(rr1); // ok
+```
+
+**注意点**
+* ⚠️ **警告注意**：使用 `move` 时应写 `std::move`，而非 `move`。
+* 💡 **理解技巧**：`move` 只是类型转换，并不真正移动任何东西，移动操作发生在构造函数或赋值运算符中。
+
+---
+
+<a id="id6"></a>
+## ✅ 知识点6: 13.6.2 移动构造函数与移动赋值运算符 (Move Constructor and Move Assignment)
+
+**理论**
+* **核心主旨总结**：自定义类可以通过定义**移动构造函数(move constructor)** 和**移动赋值运算符(move-assignment operator)** 来支持移动操作。它们类似于拷贝操作，但“窃取”资源而非拷贝。
+* 移动构造函数的第一个参数是**本类类型的右值引用**，任何额外参数都必须有默认实参。
+* **必须确保移后源对象处于可安全销毁的状态**，通常将其内部指针置为 `nullptr`，使得析构函数无害。
+
+**教材示例代码**  
+本节无独立代码块，具体示例见下一知识点。
+
+**注意点**
+* 📋 **术语提醒**：**移动构造函数(move constructor)**、**移动赋值运算符(move-assignment operator)**。
+
+---
+
+<a id="id7"></a>
+## ✅ 知识点7: StrVec 移动构造函数
+
+**理论**
+* **核心主旨总结**：`StrVec` 移动构造函数**不分配新内存**，直接接管源对象的指针成员（`elements`, `first_free`, `cap`），然后将源对象的指针置为 `nullptr`，使其处于可析构状态。
+* **`noexcept` 说明符**：标记该函数不抛出异常，告知标准库可以安全使用。`noexcept` 出现在参数列表之后，初始化列表冒号之前。
+
+**教材示例代码**
+```cpp
+StrVec::StrVec(StrVec &&s) noexcept // move won't throw any exceptions
+    : elements(s.elements), first_free(s.first_free), cap(s.cap)
+{
+    // leave s in a state in which it is safe to run the destructor
+    s.elements = s.first_free = s.cap = nullptr;
+}
+```
+
+**注意点**
+* ⚠️ **警告注意**：如果不将源对象指针置空，源对象析构时会释放已被移动的内存，导致**双重释放**。
+* 💡 **理解技巧**：移动构造是“资源偷窃”，源对象成为空壳。
+
+---
+
+<a id="id8"></a>
+## ✅ 知识点8: 移动操作、库容器与异常 (Move Operations, Library Containers, and Exceptions)
+
+**理论**
+* **核心主旨总结**：移动操作通常不分配资源，因此**不会抛出异常**。若移动操作可能抛出异常，标准库容器（如 `vector`）在重新分配时会**优先使用拷贝构造函数**以保证异常安全。
+* **使用 `noexcept` 告知库**：若移动构造函数标记为 `noexcept`，`vector` 将选择移动而非拷贝；否则为安全起见使用拷贝。
+* `noexcept` 必须同时在类内声明和类外定义中出现。
+
+**教材示例代码**
+```cpp
+class StrVec {
+public:
+    StrVec(StrVec&& s) noexcept; // move constructor
+    // other members as before
+};
+
+StrVec::StrVec(StrVec &&s) noexcept : /* member initializers */
+{ /* constructor body */ }
+```
+
+**注意点**
+* 📋 **术语提醒**：**异常安全(exception safety)**。
+* 💡 **理解技巧**：`noexcept` 是对库的“信任状”，允许库采用更高效的移动操作。
+
+---
+
+<a id="id9"></a>
+## ✅ 知识点9: 移动赋值运算符 (Move-Assignment Operator)
+
+**理论**
+* **核心主旨总结**：移动赋值运算符执行与析构函数+移动构造函数相似的工作。必须**检查自赋值**，释放左操作数原有资源，接管右操作数资源，并将右操作数指针置为 `nullptr`。
+* 自赋值检查是必要的，因为右操作数可能是 `std::move` 作用于左操作数的结果。
+
+**教材示例代码**
+```cpp
+StrVec &StrVec::operator=(StrVec &&rhs) noexcept
+{
+    // direct test for self-assignment
+    if (this != &rhs) {
+        free();
+        elements = rhs.elements;   // take over resources from rhs
+        first_free = rhs.first_free;
+        cap = rhs.cap;
+        // leave rhs in a destructible state
+        rhs.elements = rhs.first_free = rhs.cap = nullptr;
+    }
+    return *this;
+}
+```
+
+**注意点**
+* ⚠️ **警告注意**：自赋值检查至关重要，否则可能释放了右操作数的资源，导致后续接管无效指针。
+* 💡 **理解技巧**：移动赋值是“先销毁自己，再偷别人”。
+
+---
+
+<a id="id10"></a>
+## ✅ 知识点10: 移后源对象必须可析构 (A Moved-from Object Must Be Destructible)
+
+**理论**
+* **核心主旨总结**：移动操作不会销毁源对象，源对象稍后仍会被析构。因此必须确保移后源对象**处于可安全析构的状态**。此外，移后源对象应保持**有效(valid)**，即可以赋予新值或执行不依赖当前值的操作，但其**值未指定(unspecified)**。
+* `StrVec` 移动操作将移后源对象置于与默认初始化相同的状态（指针为 `nullptr`），所有操作仍可正常执行。
+* 其他类可能有更复杂的内部结构，行为可能不同。
+
+**教材示例代码**  
+本节无独立代码块。
+
+**注意点**
+* ⚠️ **警告注意**：移后源对象必须保持有效、可析构，但**程序绝不能依赖其值**。
+* 💡 **理解技巧**：移后源对象像是一个“空壳”，可以安全地销毁或赋予新值，但不保证为空。
+
+---
+
+<a id="id11"></a>
+## ✅ 知识点11: 合成的移动操作 (The Synthesized Move Operations)
+
+**理论**
+* **核心主旨总结**：编译器合成移动构造/赋值运算符的条件比拷贝操作严格得多：
+  1. 该类**没有定义任何自己的拷贝控制成员**（拷贝构造、拷贝赋值、析构函数）。
+  2. 每个非静态数据成员都**可移动**（内置类型可移动，类类型有其移动操作）。
+* **若显式请求 `= default` 但无法移动所有成员，则移动操作被定义为删除(deleted)**。
+* **删除规则**（与拷贝操作类似但有例外）：
+  - 若类有成员定义了拷贝构造但未定义移动构造，或成员无法合成移动构造，则移动构造定义为删除（若显式请求）。
+  - 若成员的移动构造/赋值是删除的或不可访问，则合成移动操作定义为删除。
+  - 若析构函数是删除的或不可访问，移动构造定义为删除。
+  - 若类有 `const` 或引用成员，移动赋值定义为删除。
+* **交互影响**：若类定义了任何移动操作，则**合成的拷贝构造函数和拷贝赋值运算符会被定义为删除**。这意味着**定义了移动操作的类必须也定义自己的拷贝操作**。
+
+**教材示例代码**
+```cpp
+// the compiler will synthesize the move operations for X and hasX
+struct X {
+    int i;               // built-in types can be moved
+    std::string s;       // string defines its own move operations
+};
+struct hasX {
+    X mem;               // X has synthesized move operations
+};
+X x, x2 = std::move(x);          // uses the synthesized move constructor
+hasX hx, hx2 = std::move(hx);    // uses the synthesized move constructor
+
+// assume Y is a class that defines its own copy constructor but not a move constructor
+struct hasY {
+    hasY() = default;
+    hasY(hasY&&) = default;
+    Y mem;                       // hasY will have a deleted move constructor
+};
+hasY hy, hy2 = std::move(hy);    // error: move constructor is deleted
+```
+
+**注意点**
+* 📋 **术语提醒**：**合成(synthesized)**、**删除的函数(deleted function)**。
+* ⚠️ **警告注意**：移动操作不会隐式定义为删除，但若显式 `= default` 而无法生成，则为删除。若类不定义任何拷贝控制成员且所有成员可移动，编译器才会合成移动操作。
+* 💡 **理解技巧**：拷贝操作是“默认可用”的，移动操作是“默认不可用”的，需满足苛刻条件才会合成。
+
+---
+
+<a id="id12"></a>
+## ✅ 知识点12: 若无移动构造函数，右值也被拷贝 (...Rvalues Are Copied If There Is No Move Constructor)
+
+**理论**
+* **核心主旨总结**：如果一个类有拷贝构造函数但没有移动构造函数，即使使用 `std::move`，**函数匹配仍会选择拷贝构造函数**。因为移动构造函数不存在，而拷贝构造函数接受 `const Foo&`，右值引用可以转换为 `const` 左值引用，所以拷贝构造函数是可行的。
+* 这种做法是安全的：拷贝构造函数不会改变源对象，且满足移动操作的基本要求。
+
+**教材示例代码**
+```cpp
+class Foo {
+public:
+    Foo() = default;
+    Foo(const Foo&); // copy constructor
+    // other members, but Foo does not define a move constructor
+};
+
+Foo x;
+Foo y(x);                  // copy constructor; x is an lvalue
+Foo z(std::move(x));       // copy constructor, because there is no move constructor
+```
+
+**注意点**
+* 💡 **理解技巧**：“移动”回退为拷贝，就像用拷贝构造函数“假装”移动。
+* 🔄 **知识关联**：赋值操作同理。
+
+---
+
+<a id="id13"></a>
+## ✅ 知识点13: 拷贝并交换赋值运算符与移动 (Copy-and-Swap Assignment Operators and Move)
+
+**理论**
+* **核心主旨总结**：定义了移动构造函数的 `HasPtr` 类，其**拷贝并交换赋值运算符**（参数为非引用类型）**同时充当拷贝赋值和移动赋值**：
+  - 参数 `rhs` 通过**拷贝初始化(copy initialization)** 获得：若实参是左值，调用拷贝构造函数；若实参是右值，调用移动构造函数。
+  - 赋值运算符体内通过 `swap` 交换 `*this` 与 `rhs`，`rhs` 析构时释放原左操作数的资源。
+* 这种设计避免重复编写两个赋值运算符。
+
+**教材示例代码**
+```cpp
+class HasPtr {
+public:
+    // added move constructor
+    HasPtr(HasPtr &&p) noexcept : ps(p.ps), i(p.i) { p.ps = 0; }
+    // assignment operator is both the move- and copy-assignment operator
+    HasPtr& operator=(HasPtr rhs)
+        { swap(*this, rhs); return *this; }
+    // other members as in § 13.2.1 (p. 511)
+};
+
+// usage:
+hp = hp2;                    // hp2 is lvalue → copy constructor copies hp2
+hp = std::move(hp2);         // move constructor moves hp2
+```
+
+**注意点**
+* 📋 **术语提醒**：**拷贝并交换(copy and swap)**。
+* 💡 **理解技巧**：参数按值传递天然区分左值/右值，函数体内只需处理交换，资源管理自动完成。
+* 🔧 **优化处理**：此模式自动获得移动赋值，无需额外定义移动赋值运算符。
+
+---
+
+<a id="id14"></a>
+## ✅ 知识点14: Message 类的移动操作 (Move Operations for the Message Class)
+
+**理论**
+* **核心主旨总结**：`Message` 类（与 `Folder` 协同）应定义移动操作，避免拷贝 `contents` 和 `folders` 的开销。
+* **辅助函数 `move_Folders`**：
+  - 使用 `std::move` 调用 `set` 的移动赋值，将 `m->folders` 移动到 `this->folders`。
+  - 遍历 `folders`，对每个 `Folder`：**删除指向旧 `Message` 的指针**，**添加指向新 `Message` 的指针**。
+  - 最后 `clear` 源对象的 `folders`，使其可安全析构。
+* **移动构造函数**：使用 `std::move` 移动 `contents`，然后调用 `move_Folders`。
+* **移动赋值运算符**：先检查自赋值，调用 `remove_from_Folders()` 解除与当前 `Folder` 的关联，移动 `contents`，再调用 `move_Folders`。
+* **注意异常**：向 `set` 插入元素可能抛出 `bad_alloc`，因此**不标记为 `noexcept`**。
+
+**教材示例代码**
+```cpp
+// move the Folder pointers from m to this Message
+void Message::move_Folders(Message *m)
+{
+    folders = std::move(m->folders); // uses set move assignment
+    for (auto f : folders) {         // for each Folder
+        f->remMsg(m);               // remove the old Message from the Folder
+        f->addMsg(this);            // add this Message to that Folder
+    }
+    m->folders.clear();             // ensure that destroying m is harmless
+}
+
+Message::Message(Message &&m) : contents(std::move(m.contents))
+{
+    move_Folders(&m); // moves folders and updates the Folder pointers
+}
+
+Message& Message::operator=(Message &&rhs)
+{
+    if (this != &rhs) {               // direct check for self-assignment
+        remove_from_Folders();
+        contents = std::move(rhs.contents); // move assignment
+        move_Folders(&rhs);           // reset the Folders to point to this Message
+    }
+    return *this;
+}
+```
+
+**注意点**
+* ⚠️ **警告注意**：移动操作可能抛出异常（内存分配失败），因此不应标记 `noexcept`。
+* 💡 **理解技巧**：`Message` 的移动不仅要转移数据，还要更新所有指向它的 `Folder`，这是“资源窃取 + 依赖更新”。
+
+---
+
+<a id="id15"></a>
+## ✅ 知识点15: 移动迭代器 (Move Iterators)
+
+**理论**
+* **核心主旨总结**：**移动迭代器(move iterator)** 是迭代器适配器，其解引用运算符返回**右值引用**，从而在算法中**移动而非拷贝**元素。
+* 通过 `make_move_iterator` 将普通迭代器转换为移动迭代器。
+* 可以传递给 `uninitialized_copy` 等算法，使得 `construct` 调用移动构造函数。
+* **谨慎使用**：标准库未保证所有算法与移动迭代器安全配合。移动后源对象被破坏，算法不应在移动后再次访问该元素或将其传递给用户定义函数。
+
+**教材示例代码**
+```cpp
+void StrVec::reallocate()
+{
+    // allocate space for twice as many elements as the current size
+    auto newcapacity = size() ? 2 * size() : 1;
+    auto first = alloc.allocate(newcapacity);
+    // move the elements
+    auto last = uninitialized_copy(make_move_iterator(begin()),
+                                   make_move_iterator(end()),
+                                   first);
+    free(); // free the old space
+    elements = first;   // update the pointers
+    first_free = last;
+    cap = elements + newcapacity;
+}
+```
+
+**注意点**
+* ⚠️ **警告注意**：不要随意使用移动迭代器，仅在确信算法不会再次使用被移动的元素时使用。
+* 💡 **理解技巧**：移动迭代器是将“拷贝语义”算法转化为“移动语义”的便捷工具。
+
+---
+
+<a id="id16"></a>
+## ✅ 知识点16: 提供拷贝和移动版本的成员函数
+
+**理论**
+* **核心主旨总结**：除了构造/赋值，其他成员函数也可受益于拷贝/移动重载。通常模式是**一个版本接受 `const T&`，另一个接受 `T&&`**。例如标准库容器的 `push_back`。
+* **不需要 `const X&&` 或 `X&` 版本**：移动版本用于窃取资源，参数应为非 `const` 右值；拷贝版本不应修改源对象。
+* **`StrVec` 的 `push_back` 重载**：左值版本拷贝元素，右值版本移动元素（通过 `std::move` 调用 `string` 移动构造函数）。
+
+**教材示例代码**
+```cpp
+class StrVec {
+public:
+    void push_back(const std::string&); // copy the element
+    void push_back(std::string&&);      // move the element
+    // other members as before
+};
+
+// unchanged from the original version in § 13.5 (p. 527)
+void StrVec::push_back(const string& s)
+{
+    chk_n_alloc();
+    alloc.construct(first_free++, s);
+}
+
+void StrVec::push_back(string&& s)
+{
+    chk_n_alloc();
+    alloc.construct(first_free++, std::move(s));
+}
+
+// usage:
+StrVec vec;
+string s = "some string or another";
+vec.push_back(s);        // calls push_back(const string&)
+vec.push_back("done");   // calls push_back(string&&)
+```
+
+**注意点**
+* 💡 **理解技巧**：重载 `push_back` 使得容器可以高效地插入临时字符串，避免不必要的拷贝。
+* 📋 **术语提醒**：**拷贝版本(copy version)**、**移动版本(move version)**。
+
+---
+
+<a id="id17"></a>
+## ✅ 知识点17: 右值和左值引用成员函数 (Rvalue and Lvalue Reference Member Functions)
+
+**理论**
+* **核心主旨总结**：可以在成员函数参数列表后添加**引用限定符(reference qualifier)**（`&` 或 `&&`），限定 `this` 指向的对象是左值还是右值。
+* 例如，可**禁止对右值对象赋值**：将赋值运算符定义为 `&&` 限定，则只能用于可修改的右值，左值对象无法调用。
+* **引用限定符必须同时出现在声明和定义中**，且可同时使用 `const` 限定符，此时 `const` 必须在前。
+* 不带引用限定符的成员函数可以在左值或右值对象上调用。
+
+**教材示例代码**
+```cpp
+class Foo {
+public:
+    Foo &operator=(const Foo&) &&; // may assign only to modifiable rvalues
+    // other members of Foo
+};
+
+Foo &Foo::operator=(const Foo &rhs) &&
+{
+    // do whatever is needed to assign rhs to this object
+    return *this;
+}
+
+// calling:
+Foo &retFoo();  // returns a reference; a call to retFoo is an lvalue
+Foo retVal();   // returns by value; a call to retVal is an rvalue
+Foo i, j;
+i = j;          // ok: i is an lvalue
+retFoo() = j;   // ok: retFoo() returns an lvalue
+retVal() = j;   // error: retVal() returns an rvalue
+i = retVal();   // ok: we can pass an rvalue as the right-hand operand to assignment
+```
+
+**注意点**
+* ⚠️ **警告注意**：引用限定符的位置：必须跟在 `const` 之后（如果有），且在参数列表之后。
+* 💡 **理解技巧**：引用限定符控制成员函数的**调用者(this)** 是左值还是右值。
+
+---
+
+<a id="id18"></a>
+## ✅ 知识点18: 重载与引用限定符 (Overloading and Reference Functions)
+
+**理论**
+* **核心主旨总结**：可以基于引用限定符重载成员函数，也可与 `const` 组合。例如 `Foo::sorted()` 提供两个版本：
+  - `sorted() &&`：对可修改右值，可**原地排序(in-place sort)**。
+  - `sorted() const &`：对 `const` 右值或左值，**拷贝后排序**。
+* **重载决议**：根据调用对象的左值/右值属性选择最匹配版本。
+* **一致性要求**：若一组重载具有相同的名称和参数列表，则**要么全部提供引用限定符，要么全不提供**。不能一部分限定、一部分不限。
+
+**教材示例代码**
+```cpp
+class Foo {
+public:
+    Foo sorted() &&;          // may run on modifiable rvalues
+    Foo sorted() const &;     // may run on any kind of Foo
+    // other members of Foo
+private:
+    vector<int> data;
+};
+
+// this object is an rvalue, so we can sort in place
+Foo Foo::sorted() &&
+{
+    sort(data.begin(), data.end());
+    return *this;
+}
+
+// this object is either const or it is an lvalue; either way we can't sort in place
+Foo Foo::sorted() const & {
+    Foo ret(*this);                     // make a copy
+    sort(ret.data.begin(), ret.data.end()); // sort the copy
+    return ret;
+}
+
+// usage:
+retVal().sorted(); // retVal() is an rvalue, calls Foo::sorted() &&
+retFoo().sorted(); // retFoo() is an lvalue, calls Foo::sorted() const &
+```
+
+**注意点**
+* ⚠️ **警告注意**：引用限定符不能部分使用——所有同名同参数列表的重载要么都有限定符，要么都没有。
+* 💡 **理解技巧**：这是 **“移动语义”在成员函数层面的延伸**，让对象本身是左值还是右值影响其行为。
+
+---
+
+## 🔑 核心要点总结
+1. **右值引用是移动语义的核心**：它只能绑定到即将销毁的临时对象，允许安全地“窃取”资源。`std::move` 将左值转换为右值引用，但使用后不应再依赖原对象的值。
+2. **移动构造函数与移动赋值运算符**：它们应标记为 `noexcept`（若不抛异常），接管源对象资源并将源对象置为可析构状态。注意自赋值检查和异常安全。
+3. **合成移动操作的条件极其严格**：仅当类未定义任何拷贝控制成员且所有数据成员可移动时，编译器才会合成移动操作。定义移动操作会抑制合成拷贝操作，因此需同时定义拷贝操作。
+4. **移动迭代器**将普通迭代器转换为右值解引用，使 `uninitialized_copy` 等算法执行移动而非拷贝，但需谨慎使用。
+5. **引用限定符**扩展了成员函数的重载能力，允许根据对象是左值还是右值选择不同行为，是实现“移动友好”接口的重要工具。
+
+## 📌 考试速记版
+* **右值引用特性**：`&&`，绑定右值，不能直接绑定左值（`std::move` 转换）。
+* **移动操作三要素**：`noexcept`、资源转移、源对象置为可析构状态。
+* **合成移动条件**：无自定义拷贝控制成员 + 所有成员可移动。
+* **移动回退为拷贝**：有拷贝无移动 → `std::move` 仍调拷贝构造。
+* **移动迭代器**：`make_move_iterator` + `uninitialized_copy` 实现批量移动构造。
+* **引用限定符**：`&`（左值对象可调用）、`&&`（右值对象可调用），重载时须一致。
+* **典型错误**：移动后仍使用源对象值、忘记标记 `noexcept` 导致 `vector` 使用低效拷贝、自赋值未检查。
+
+**记忆口诀**：
+> 右值引用绑临时，`move` 转换左值移。  
+> 移动构造窃资源，源置空壳析构安。  
+> `noexcept` 许高效，合成条件严且少。  
+> 无移则拷保安全，迭代器移需谨慎。  
+> 引用限定分左右，重载一致莫遗漏。
