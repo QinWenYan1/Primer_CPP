@@ -392,17 +392,25 @@ hp = std::move(hp2);         // move constructor moves hp2
 * **移动赋值运算符**：先检查自赋值，调用 `remove_from_Folders()` 解除与当前 `Folder` 的关联，移动 `contents`，再调用 `move_Folders`。
 * **注意异常**：向 `set` 插入元素可能抛出 `bad_alloc`，因此**不标记为 `noexcept`**。
 
+**注意点**
+* ⚠️ **警告注意**：移动操作可能抛出异常（内存分配失败），因此不应标记 `noexcept`。
+* 💡 **理解技巧**：`Message` 的移动不仅要转移数据，还要更新所有指向它的 `Folder`，这是“资源窃取 + 依赖更新”。
+
 **教材示例代码**
 ```cpp
-// move the Folder pointers from m to this Message
-void Message::move_Folders(Message *m)
+void Message::move_Folders(Message *m)  // m 是源对象（即将被掏空）
 {
-    folders = std::move(m->folders); // uses set move assignment
-    for (auto f : folders) {         // for each Folder
-        f->remMsg(m);               // remove the old Message from the Folder
-        f->addMsg(this);            // add this Message to that Folder
+    // 1. 偷走 m 的 folders 集合（O(1)，不拷贝）
+    folders = std::move(m->folders);
+    
+    // 2. 更新每个 Folder：删除旧 Message，添加新 Message
+    for (auto f : folders) {
+        f->remMsg(m);      // 从 Folder 中移除 m
+        f->addMsg(this);   // 向 Folder 添加 this（新对象）
     }
-    m->folders.clear();             // ensure that destroying m is harmless
+    
+    // 3. 清空 m 的 folders，确保 m 析构时不会重复操作
+    m->folders.clear();
 }
 
 Message::Message(Message &&m) : contents(std::move(m.contents))
@@ -421,9 +429,6 @@ Message& Message::operator=(Message &&rhs)
 }
 ```
 
-**注意点**
-* ⚠️ **警告注意**：移动操作可能抛出异常（内存分配失败），因此不应标记 `noexcept`。
-* 💡 **理解技巧**：`Message` 的移动不仅要转移数据，还要更新所有指向它的 `Folder`，这是“资源窃取 + 依赖更新”。
 
 ---
 
