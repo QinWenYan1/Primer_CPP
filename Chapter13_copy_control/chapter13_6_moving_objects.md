@@ -534,7 +534,7 @@ vec.push_back("done");   // calls push_back(string&&)
 
 **理论**
 * **核心主旨总结**：
-    * 新标准前无法阻止对右值赋值等不合理操作
+    * 新标准前无法阻止对右值赋值等这种不合理操作
     * 现在可以在成员函数参数列表后添加**引用限定符(reference qualifier)**（`&` 或 `&&`），限定 `this` 指向的对象是左值还是右值（和之前`const`做法一样）。
 * 例如，可**禁止对右值对象赋值**：将赋值运算符定义为 `&&` 限定，则只能用于可修改的右值，左值对象无法调用。
 * **引用限定符必须同时出现在声明和定义中**，且可同时使用 `const` 限定符，此时 `const` 必须在前。
@@ -548,11 +548,15 @@ vec.push_back("done");   // calls push_back(string&&)
 ```cpp
 class Foo {
 public:
-    Foo &operator=(const Foo&) &&; // may assign only to modifiable rvalues
+    Foo &operator=(const Foo&) &; // may assign only to modifiable rvalues
     // other members of Foo
+
+    Foo someMem() & const; // error: const qualifier must come first
+    Foo anotherMem() const &; // ok: const qualifier comes first
+
 };
 
-Foo &Foo::operator=(const Foo &rhs) &&
+Foo &Foo::operator=(const Foo &rhs) &
 {
     // do whatever is needed to assign rhs to this object
     return *this;
@@ -578,42 +582,27 @@ i = retVal();   // ok: we can pass an rvalue as the right-hand operand to assign
     * 可以基于引用限定符重载成员函数，也可与 `const` 组合。例如 `Foo::sorted()` 提供两个版本：
   - `sorted() &&`：对可修改右值，可**原地排序(in-place sort)**。
   - `sorted() const &`：对 `const` 右值或左值，**拷贝后排序**。
-* **重载决议**：根据调用对象的左值/右值属性选择最匹配版本。
-* **一致性要求**：若一组重载具有相同的名称和参数列表，则**要么全部提供引用限定符，要么全不提供**。不能一部分限定、一部分不限。
+* **重载决议**(overloaded reolution)：根据调用对象的左值/右值属性选择最匹配版本。
+* **一致性要求**：
+    * 若一组重载具有相同的名称和参数列表，则**要么全部提供引用限定符，要么全不提供**。
+    * 不能一部分限定、一部分不限。
 
 **注意点**
 * ⚠️ **警告注意**：引用限定符不能部分使用——所有同名同参数列表的重载要么都有限定符，要么都没有。
-* 💡 **理解技巧**：这是 **“移动语义”在成员函数层面的延伸**，让对象本身是左值还是右值影响其行为。
 
 
 **教材示例代码**
 ```cpp
 class Foo {
 public:
-    Foo sorted() &&;          // may run on modifiable rvalues
-    Foo sorted() const &;     // may run on any kind of Foo
-    // other members of Foo
-private:
-    vector<int> data;
+    Foo sorted() &&;
+    Foo sorted() const; // error: must have reference qualifier
+    // Comp is type alias for the function type (see § 6.7 (p. 249))
+    // that can be used to compare int values
+    using Comp = bool(const int&, const int&);
+    Foo sorted(Comp*); // ok: different parameter list
+    Foo sorted(Comp*) const; // ok: neither version is reference qualified
 };
-
-// this object is an rvalue, so we can sort in place
-Foo Foo::sorted() &&
-{
-    sort(data.begin(), data.end());
-    return *this;
-}
-
-// this object is either const or it is an lvalue; either way we can't sort in place
-Foo Foo::sorted() const & {
-    Foo ret(*this);                     // make a copy
-    sort(ret.data.begin(), ret.data.end()); // sort the copy
-    return ret;
-}
-
-// usage:
-retVal().sorted(); // retVal() is an rvalue, calls Foo::sorted() &&
-retFoo().sorted(); // retFoo() is an lvalue, calls Foo::sorted() const &
 ```
 
 ---
