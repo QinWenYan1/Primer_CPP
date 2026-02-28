@@ -51,3 +51,11 @@ ISBN number: 10 Average price: 0.95 Sold number: 24
   - `in >> price` 读取下一个 double，流中剩余 `".95 0-210-99999-9"`，`>>` 会读取 `0.95`（因为 `.95` 是合法的 double 表示），所以 `price` 变为 `0.95`。
   - 最后 `revenue = 24 * 0.95 = 22.8`。
 所以对象状态为：`bookNo="10"`, `units_sold=24`, `revenue=22.8`，这与学生的输出 `ISBN number: 10 Average price: 0.95 Sold number: 24` 一致（平均价格 = revenue/units_sold = 22.8/24 = 0.95）。学生给出的输出是正确的，但缺少对过程的解释。
+
+Exercise 12:
+略
+
+---
+
+Exercise 15：
+略
