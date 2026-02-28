@@ -92,7 +92,7 @@ private: //member data: private
 //读取数据进入到实例中，返回输入流，支持链式操作
 inline std::istream &operator>>(std::istream &in, Sales_data &item){
 
-    in >> item.bookNo >> item.price >> item.units_sold;  
+    in >> item.bookNo >> item.units_sold >> item.price;  
     if (!in) { //如果有问题的话那么我们进行初始化处理
         std::cout << "Input error detected ..." << std::endl; 
         item.bookNo = "None"; 
