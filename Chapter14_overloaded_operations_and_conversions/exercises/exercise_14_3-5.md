@@ -101,3 +101,7 @@ Explain how to decide whether the following should be class members:
 (g) 非成员（对称性）
 (h) 成员（函数调用运算符只能是成员）
 ```
+
+---
+Exercise 5:
+省略
