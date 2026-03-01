@@ -52,10 +52,8 @@ ISBN number: 10 Average price: 0.95 Sold number: 24
   - 最后 `revenue = 24 * 0.95 = 22.8`。
 所以对象状态为：`bookNo="10"`, `units_sold=24`, `revenue=22.8`，这与学生的输出 `ISBN number: 10 Average price: 0.95 Sold number: 24` 一致（平均价格 = revenue/units_sold = 22.8/24 = 0.95）。学生给出的输出是正确的，但缺少对过程的解释。
 
-Exercise 12:
-略
 
 ---
 
-Exercise 15：
+Exercise 12:
 略
