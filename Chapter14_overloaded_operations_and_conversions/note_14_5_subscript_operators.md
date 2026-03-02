@@ -88,8 +88,8 @@ private:
 
 **注意点**
 * ⚠️ **关键区别**：`svec[0]`调用非const版本，返回`string&`，允许修改；`cvec[0]`调用const版本，返回`const string&`，禁止修改，导致编译错误。
-* 💡 **理解技巧**：const对象的下标操作自动选择const重载，这是重载决议（overload resolution）的结果，保证了const对象的只读性。
-* 🔄 **知识关联**：与标准库容器（如`vector<int>`）的const版本行为一致，确保接口一致性。
+* 💡 **理解技巧**：const对象的下标操作自动选择const重载，这是重载决议的结果，保证了const对象的只读性。
+* 🔄 **关键一致性**：与标准库容器（如`vector<int>`）的const版本行为一致，确保接口一致性。
 
 **教材示例代码**
 ```cpp
