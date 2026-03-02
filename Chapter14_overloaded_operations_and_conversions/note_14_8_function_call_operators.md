@@ -13,14 +13,14 @@
 * [*知识点5: PrintString类的定义与构造函数*](#id5)
 * [*知识点6: PrintString对象的使用示例*](#id6)
 * [*知识点7: 使用PrintString与for_each算法*](#id7)
-* [*知识点8: 14.8.1 Lambdas Are Function Objects*](#id8)
-* [*知识点9: Classes Representing Lambdas with Captures*](#id9)
-* [*知识点10: 14.8.2 Library-Defined Function Objects*](#id10)
-* [*知识点11: Using a Library Function Object with the Algorithms*](#id11)
-* [*知识点12: 14.8.3 Callable Objects and function*](#id12)
-* [*知识点13: Different Types Can Have the Same Call Signature*](#id13)
-* [*知识点14: The Library function Type*](#id14)
-* [*知识点15: Overloaded Functions and function*](#id15)
+* [*知识点8: lambda是函数对象*](#id8)
+* [*知识点9: 带捕获的lambda生成的类*](#id9)
+* [*知识点10: 标准库定义的函数对象*](#id10)
+* [*知识点11: 使用库函数对象与算法*](#id11)
+* [*知识点12: 可调用对象与function类型*](#id12)
+* [*知识点13: 不同类型可具有相同调用签名*](#id13)
+* [*知识点14: 标准库function类型*](#id14)
+* [*知识点15: 重载函数与function*](#id15)
 * [*知识点16: Note：function与bind的关系*](#id16)
 
 ---
@@ -30,16 +30,14 @@
 
 **理论**
 
-* 重载了**函数调用运算符(function-call operator)**的类，其对象可以像函数一样使用。
+* 重载了**函数调用运算符**的类，其对象可以像函数一样使用。
 * 由于这样的类可以存储状态，因此它们比普通函数更灵活。
 * **核心主旨**：通过重载`operator()`，让类的对象拥有函数的行为，并且可以利用成员存储状态实现定制化操作。
 
-**教材示例代码**
-*(暂无独立代码，此知识点为概念介绍)*
 
 **注意点**
 * 💡 **理解技巧**：函数对象是“行为像函数的对象”，但本质是类的实例。
-* 📋 **术语提醒**：**函数调用运算符(function-call operator)**，即`operator()`。
+
 
 ---
 
@@ -176,7 +174,7 @@ for_each(vs.begin(), vs.end(), PrintString(cerr, '\n'));
 ---
 
 <a id="id8"></a>
-## ✅ 知识点8: 14.8.1 Lambdas Are Function Objects
+## ✅ 知识点8: lambda是函数对象
 
 **理论**
 
@@ -215,7 +213,7 @@ stable_sort(words.begin(), words.end(), ShorterString());
 ---
 
 <a id="id9"></a>
-## ✅ 知识点9: Classes Representing Lambdas with Captures
+## ✅ 知识点9: 带捕获的lambda生成的类
 
 **理论**
 
@@ -254,7 +252,7 @@ auto wc = find_if(words.begin(), words.end(), SizeComp(sz));
 ---
 
 <a id="id10"></a>
-## ✅ 知识点10: 14.8.2 Library-Defined Function Objects
+## ✅ 知识点10: 标准库定义的函数对象
 
 **理论**
 
@@ -290,7 +288,7 @@ sum = intAdd(10, intNegate(10)); // sum = 0
 ---
 
 <a id="id11"></a>
-## ✅ 知识点11: Using a Library Function Object with the Algorithms
+## ✅ 知识点11: 使用库函数对象与算法
 
 **理论**
 
@@ -317,7 +315,7 @@ sort(nameTable.begin(), nameTable.end(), less<string*>());
 ---
 
 <a id="id12"></a>
-## ✅ 知识点12: 14.8.3 Callable Objects and function
+## ✅ 知识点12: 可调用对象与function类型
 
 **理论**
 
@@ -334,7 +332,7 @@ sort(nameTable.begin(), nameTable.end(), less<string*>());
 ---
 
 <a id="id13"></a>
-## ✅ 知识点13: Different Types Can Have the Same Call Signature
+## ✅ 知识点13: 不同类型可具有相同调用签名
 
 **理论**
 
@@ -371,7 +369,7 @@ binops.insert({"+", add});       // 正确：add是函数指针
 ---
 
 <a id="id14"></a>
-## ✅ 知识点14: The Library function Type
+## ✅ 知识点14: 标准库function类型
 
 **理论**
 
@@ -425,7 +423,7 @@ binops["%"](10, 5);    // 调用mod lambda
 ---
 
 <a id="id15"></a>
-## ✅ 知识点15: Overloaded Functions and function
+## ✅ 知识点15: 重载函数与function
 
 **理论**
 
