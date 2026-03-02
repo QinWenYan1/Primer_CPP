@@ -42,12 +42,16 @@
 ---
 
 <a id="id2"></a>
-## ✅ 知识点2: absInt函数对象类示例
+## ✅ 知识点2: `absInt`函数对象类示例
 
 **理论**
 
 * 定义了一个简单的函数对象类`absInt`，它的调用运算符返回参数的绝对值。
 * 通过向`absInt`对象传递参数来“调用”它，实际执行的是`operator()`成员函数。
+
+**注意点**
+* 💡 **理解技巧**：`absObj(i)` 语法上像函数调用，但实际上是调用了对象的`operator()`成员。
+* ⚠️ **警告注意**：即使`absObj`是对象而非函数，我们仍可以“调用”它。
 
 **教材示例代码**
 
@@ -63,9 +67,6 @@ absInt absObj;                  // 含有函数调用运算符的对象
 int ui = absObj(i);              // 将 i 传递给 absObj.operator()
 ```
 
-**注意点**
-* 💡 **理解技巧**：`absObj(i)` 语法上像函数调用，但实际上是调用了对象的`operator()`成员。
-* ⚠️ **警告注意**：即使`absObj`是对象而非函数，我们仍可以“调用”它。
 
 ---
 
@@ -92,8 +93,7 @@ int ui = absObj(i);              // 将 i 传递给 absObj.operator()
 * 这些数据成员通常用于定制调用运算符中的操作行为。
 * 通过构造函数初始化这些成员，使得函数对象可以携带状态。
 
-**教材示例代码**
-*(概念介绍，代码在下一个知识点)*
+
 
 **注意点**
 * 💡 **理解技巧**：状态使得同一个函数对象类可以产生不同行为的实例（例如输出到不同流、使用不同分隔符）。
@@ -101,7 +101,7 @@ int ui = absObj(i);              // 将 i 传递给 absObj.operator()
 ---
 
 <a id="id5"></a>
-## ✅ 知识点5: PrintString类的定义与构造函数
+## ✅ 知识点5: `PrintString`类的定义与构造函数
 
 **理论**
 
@@ -123,13 +123,12 @@ private:
 ```
 
 **注意点**
-* 📋 **术语提醒**：**带状态的函数对象(function object with state)**。
 * 💡 **理解技巧**：构造函数使用默认实参，使得可以灵活创建不同行为的对象。
 
 ---
 
 <a id="id6"></a>
-## ✅ 知识点6: PrintString对象的使用示例
+## ✅ 知识点6: `PrintString`对象的使用示例
 
 **理论**
 
@@ -152,7 +151,7 @@ errors(s);                 // 将s输出到cerr，后跟一个换行
 ---
 
 <a id="id7"></a>
-## ✅ 知识点7: 使用PrintString与for_each算法
+## ✅ 知识点7: 使用`PrintString`与`for_each`算法
 
 **理论**
 
@@ -195,6 +194,9 @@ for_each(vs.begin(), vs.end(), PrintString(cerr, '\n'));
   ```
 * 默认情况下，lambda不能修改捕获的变量，因此生成的函数调用运算符是`const`成员函数；如果lambda声明为`mutable`，则调用运算符不是`const`。
 
+**注意点**
+* ⚠️ **重要理解**：lambda是语法糖，底层生成的就是一个函数对象类。
+
 **教材示例代码**
 
 ```cpp
@@ -206,9 +208,6 @@ stable_sort(words.begin(), words.end(),
 stable_sort(words.begin(), words.end(), ShorterString());
 ```
 
-**注意点**
-* ⚠️ **重要理解**：lambda是语法糖，底层生成的就是一个函数对象类。
-* 📋 **术语提醒**：**lambda表达式(lambda expression)** 与 **函数对象(function object)** 的关系。
 
 ---
 
@@ -217,22 +216,14 @@ stable_sort(words.begin(), words.end(), ShorterString());
 
 **理论**
 
-* 当lambda通过引用捕获变量时，编译器可以直接使用该引用，而无需将其存储为数据成员（因为引用的生存期由程序员保证）。
-* 当lambda通过值捕获变量时，这些变量会被拷贝到lambda中，因此生成的类会有对应的数据成员和一个构造函数来初始化这些成员。
-* 例如，lambda `[sz](const string &a) { return a.size() >= sz; }` 生成的类类似于：
-  ```cpp
-  class SizeComp {
-  public:
-      SizeComp(size_t n) : sz(n) {}   // 构造函数初始化捕获的变量
-      bool operator()(const string &a) const {
-          return a.size() >= sz;
-      }
-  private:
-      size_t sz;   // 对应值捕获的变量
-  };
-  ```
-* 这个类没有默认构造函数，要使用它必须传递参数。
-* 由lambda生成的类具有**删除的默认构造函数、删除的赋值运算符、默认的析构函数**。拷贝/移动构造函数是否合成取决于捕获的数据成员类型。
+* 当lambda通过引用捕获变量时:
+    * 编译器可以直接使用该引用，而无需将其存储为数据成员（因为引用的生存期由程序员保证）。
+* 当lambda通过值捕获变量时:
+    * 这些变量会被拷贝到lambda中，因此生成的类会有对应的数据成员和一个构造函数来初始化这些成员。
+
+**注意点**
+* ⚠️ **重要特性**：lambda生成的类没有默认构造函数，必须提供捕获变量的值才能创建对象。
+
 
 **教材示例代码**
 
@@ -244,10 +235,22 @@ auto wc = find_if(words.begin(), words.end(),
 // 等价于使用 SizeComp 对象
 auto wc = find_if(words.begin(), words.end(), SizeComp(sz));
 ```
-
-**注意点**
-* ⚠️ **重要特性**：lambda生成的类没有默认构造函数，必须提供捕获变量的值才能创建对象。
-* 🔄 **知识关联**：这些类的拷贝控制成员遵循常规规则（第13章）。
+```cpp
+  class SizeComp {
+  public:
+      SizeComp(size_t n) : sz(n) {}   // 构造函数初始化捕获的变量
+      bool operator()(const string &a) const {
+          return a.size() >= sz;
+      }
+  private:
+      size_t sz;   // 对应值捕获的变量
+  };
+  ```
+**代码解析**
+* 这个类没有默认构造函数，要使用它必须传递参数。
+* 由lambda生成的类具有**删除的默认构造函数、删除的赋值运算符、默认的析构函数**。
+* 拷贝/移动构造函数是否合成取决于捕获的数据成员类型。
+* 这些类的拷贝控制成员遵循常规规则（第13章）。
 
 ---
 
