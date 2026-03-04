@@ -168,7 +168,7 @@ uival + lval;       // 根据相对大小转换
 命名转换的语法格式为：
 
 ```cpp
-cast-name<type>(expression);
+cast_name<type>(expression);
 ```
 * **`type`**：目标转换类型
 * **`expression`**：要转换的值或表达式
@@ -211,7 +211,7 @@ char *q = static_cast<char*>(cp);
 static_cast<string>(cp); // ok: 将字符串字面值转换为字符串
 const_cast<string>(cp); // error: const_cast 无法改变类型
 ```
-⚠️ 通过 p 写入原是 const 的对象是未定义行为
+⚠️ 通过 `cp` 写入原是 const 的对象是未定义行为
 
 ---
 
