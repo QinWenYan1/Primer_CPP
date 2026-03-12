@@ -106,8 +106,12 @@ private:
 }; 
 ```
 ```cpp
-base bobj; base *bp1 = &bobj; base &br1 = bobj;
-derived dobj; base *bp2 = &dobj; base &br2 = dobj;
+base bobj; 
+base *bp1 = &bobj; 
+base &br1 = bobj;
+derived dobj; 
+base *bp2 = &dobj; 
+base &br2 = dobj;
 ```
 
 (a) `bobj.print();` 
