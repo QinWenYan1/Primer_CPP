@@ -25,20 +25,20 @@
 ## ✅ 知识点1: 类对派生类的访问控制
 
 **理论**
-* 正如每个类控制自己的成员初始化一样，**每个类也控制其成员是否对派生类可访问(accessible)**
+* 正如每个类控制自己的成员初始化一样，**每个类也控制其成员是否对派生类可访问**
 * 基类通过访问说明符(access specifiers)决定哪些成员可以被派生类使用
 * 这种控制机制是类的封装(encapsulation)机制在继承体系中的延伸
 
 ---
 
 <a id="id2"></a>
-## ✅ 知识点2: protected成员的基本特性
+## ✅ 知识点2: `protected`成员的基本特性
 
 **理论**
-* **protected**访问说明符是**private**和**public**的混合体(blend)：
-  * **像private一样**：protected成员对类的普通用户(users of the class)**不可访问(inaccessible)**
-  * **像public一样**：protected成员对派生类的成员和友元(members and friends of derived classes)**可访问(accessible)**
-* protected成员的设计目的：允许基类将某些实现细节分享给派生类使用，但阻止外部普通代码访问
+* <b>`protected`</b>访问说明符是<b>`private`</b>和<b>`public`</b>的混合体：
+  * **像`private`一样**：`protected`成员对类的普通用户**不可访问**
+  * <b>像`public`一样</b>：`protected`成员对派生类的成员和友元<b>可访问</b>
+* **`protected`成员的设计目的**：允许基类将某些实现细节分享给派生类使用，但阻止外部普通代码访问
 
 **教材示例代码**
 ```cpp
@@ -57,13 +57,18 @@ class Sneaky : public Base {
 ---
 
 <a id="id3"></a>
-## ✅ 知识点3: protected成员的关键限制
+## ✅ 知识点3: `protected`成员的关键限制
 
 **理论**
-* protected成员有一个**重要且容易误解**的属性：
-  * **派生类成员或友元只能通过派生类对象访问基类的protected成员**
-  * 派生类对基类对象的protected成员**没有特殊访问权限**
-* 换句话说，派生类可以访问**自己继承而来的**protected成员，但不能直接访问**独立的基类对象**的protected成员
+* `protected`成员有一个**重要且容易误解**的属性：
+  * **派生类成员或友元只能通过派生类对象访问基类的`protected`成员**
+  * 派生类对基类对象的`protected`成员**没有特殊访问权限**
+* 换句话说，
+ ✅ 通过派生类对象访问继承的`protected`成员合法
+ ❌ 直接访问基类对象的`protected`成员非法
+
+**注意点**
+* ⚠️ **设计意图**：`protected`检查的是<b>"访问路径"</b>——只有通过"派生类对象"这条路径才能访问，"基类对象"路径被阻断，保护封装性
 
 **教材示例代码**
 ```cpp
@@ -74,10 +79,6 @@ void clobber(Sneaky &s) { s.j = s.prot_mem = 0; }
 void clobber(Base &b) { b.prot_mem = 0; }
 ```
 
-**注意点**
-* ⚠️ **关键区别**：`s.prot_mem`合法（通过派生类对象访问继承的protected成员），但`b.prot_mem`非法（直接访问基类对象的protected成员）
-* 💡 **设计意图**：如果允许通过基类对象访问protected成员，那么任何类只需继承基类就能绕过protected保护机制访问任意基类对象的内部数据
-* 🔄 **记忆技巧**：protected检查的是**"访问路径"**——只有通过"派生类对象"这条路径才能访问，"基类对象"路径被阻断
 
 ---
 
@@ -86,9 +87,9 @@ void clobber(Base &b) { b.prot_mem = 0; }
 
 **理论**
 * 对继承成员的访问由两个因素共同控制：
-  1. 基类中该成员的**访问说明符**(access specifier)
-  2. 派生类**派生列表**(derivation list)中的**派生访问说明符**(derivation access specifier)
-* 三种派生访问说明符：**public**（公有继承）、**private**（私有继承）、**protected**（保护继承）
+  1. 基类中该成员的**访问说明符**
+  2. 派生类**派生列表**中的**派生访问说明符**
+* 三种派生访问说明符：**`public`**（公有继承）、**`private`**（私有继承）、**`protected`**（保护继承）
 
 **教材示例代码**
 ```cpp
