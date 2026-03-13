@@ -185,8 +185,11 @@ protected:
 ## ✅ 知识点8: 含纯虚函数的类是抽象基类
 
 **理论**
-* **核心主旨总结**：包含（或继承但未覆盖）纯虚函数的类称为**抽象基类(abstract base class)**。抽象基类定义了一个接口，供后续派生类覆盖。我们**不能直接创建抽象基类类型的对象**。
-* **实例化限制**：因为 `Disc_quote` 将 `net_price` 定义为纯虚函数，所以我们不能定义 `Disc_quote` 类型的对象。但是，可以定义继承自 `Disc_quote` 的类的对象，只要这些类覆盖了 `net_price`。
+* **核心主旨总结**：
+    * 包含（或继承但未覆盖）纯虚函数的类称为**抽象基类(abstract base class)**。
+    * 抽象基类定义了一个接口，供后续派生类覆盖。
+    * 我们**不能直接创建抽象基类类型的对象**。
+
 
 **教材示例代码**
 ```cpp
@@ -195,11 +198,7 @@ Disc_quote discounted;  // error: can't define a Disc_quote object
 Bulk_quote bulk;        // ok: Bulk_quote has no pure virtual functions
 ```
 
-**注意点**
-* 📋 **术语定义**：Abstract Base Class(ABC) = 包含纯虚函数的类
-* ⚠️ **编译错误**：尝试实例化抽象基类会导致编译错误（如 `Disc_quote discounted;`）
-* ✅ **合法实例化**：只有当派生类覆盖了所有纯虚函数后，才能实例化该派生类（如 `Bulk_quote`）
-* 🔄 **继承规则**：继承自 `Disc_quote` 的类必须定义 `net_price`，否则该类也是抽象基类
+
 
 ---
 
@@ -207,16 +206,21 @@ Bulk_quote bulk;        // ok: Bulk_quote has no pure virtual functions
 ## ✅ 知识点9: 抽象基类的对象创建限制
 
 **理论**
-* **核心主旨总结**：**我们不能创建抽象基类类型的对象**。这是抽象基类的根本特征，强制派生类必须实现所有纯虚函数才能被实例化。
+* **核心主旨总结**：**我们不能创建抽象基类类型的对象**。
+* 这是抽象基类的根本特征，强制派生类必须实现所有纯虚函数才能被实例化。
+
+**注意点**
+* ⚠️ **编译时检查**：编译器会在编译时阻止抽象基类的实例化
+* 💡 **设计价值**：这一限制确保了所有被使用的对象都具有完整的实现，避免"半实现"对象被误用
+
+* ⚠️ **编译错误**：尝试实例化抽象基类会导致编译错误（如 `Disc_quote discounted;`）
+* ✅ **合法实例化**：只有当派生类覆盖了所有纯虚函数后，才能实例化该派生类（如 `Bulk_quote`）
 
 **教材示例代码**
 ```cpp
 Disc_quote discounted;  // error: can't define a Disc_quote object
 ```
 
-**注意点**
-* ⚠️ **编译时检查**：编译器会在编译时阻止抽象基类的实例化
-* 💡 **设计价值**：这一限制确保了所有被使用的对象都具有完整的实现，避免"半实现"对象被误用
 
 ---
 
@@ -224,7 +228,15 @@ Disc_quote discounted;  // error: can't define a Disc_quote object
 ## ✅ 知识点10: 派生类构造函数只初始化直接基类
 
 **理论**
-* **核心主旨总结**：现在可以重新实现 `Bulk_quote` 类，让它继承自 `Disc_quote` 而不是直接继承 `Quote`。`Bulk_quote` 的类定义与之前的版本类似，只需要修改其构造函数。
+* **核心主旨总结**：
+    * 现在可以重新实现 `Bulk_quote` 类，让它继承自 `Disc_quote` 而不是直接继承 `Quote`。
+    * `Bulk_quote` 的类定义与之前的版本类似，只需要修改其构造函数。
+
+
+**注意点**
+* 🔧 **构造函数变化**：新构造函数接受四个参数，但只将它们传递给 `Disc_quote` 的构造函数，不再直接调用 `Quote` 的构造函数
+* 📋 **初始化责任**：**派生类构造函数只负责初始化其直接基类**。`Bulk_quote` 的直接基类是 `Disc_quote`，`Disc_quote` 再负责初始化 `Quote`
+* 🔄 **构造链**：`Bulk_quote` → `Disc_quote` → `Quote` 的构造函数链
 
 **教材示例代码**
 ```cpp
@@ -241,15 +253,11 @@ public:
 };
 ```
 
-**注意点**
-* 🔧 **构造函数变化**：新构造函数接受四个参数，但只将它们传递给 `Disc_quote` 的构造函数，不再直接调用 `Quote` 的构造函数
-* 📋 **初始化责任**：**派生类构造函数只负责初始化其直接基类**。`Bulk_quote` 的直接基类是 `Disc_quote`，`Disc_quote` 再负责初始化 `Quote`
-* 🔄 **构造链**：`Bulk_quote` → `Disc_quote` → `Quote` 的构造函数链
 
 ---
 
 <a id="id11"></a>
-## ✅ 知识点11: Bulk_quote类的重构实现
+## ✅ 知识点11: `Bulk_quote`类的重构实现
 
 **理论**
 * **核心主旨总结**：这个版本的 `Bulk_quote` 有一个直接基类 `Disc_quote` 和一个间接基类 `Quote`。每个 `Bulk_quote` 对象包含三个子对象：一个（空的）`Bulk_quote` 部分、一个 `Disc_quote` 子对象（包含 `quantity` 和 `discount`），以及一个 `Quote` 子对象（包含 `bookNo` 和 `price`）。
