@@ -68,7 +68,7 @@ class Sneaky : public Base {
  ❌ 直接访问基类对象的`protected`成员非法
 
 **注意点**
-* ⚠️ **设计意图**：`protected`检查的是<b>"访问路径"</b>——只有通过"派生类对象"这条路径才能访问，"基类对象"路径被阻断，保护封装性
+* ⚠️ **设计意图**：`protected`检查的是<b>"访问路径"</b>——只有通过"派生类对象"这条路径才能访问，"基类对象"路径被阻断，保护基类的封装
 
 **教材示例代码**
 ```cpp
@@ -89,7 +89,10 @@ void clobber(Base &b) { b.prot_mem = 0; }
 * 对继承成员的访问由两个因素共同控制：
   1. 基类中该成员的**访问说明符**
   2. 派生类**派生列表**中的**派生访问说明符**
-* 三种派生访问说明符：**`public`**（公有继承）、**`private`**（私有继承）、**`protected`**（保护继承）
+* 三种派生访问说明符：
+  1. **`public`**（公有继承）
+  2. **`private`**（私有继承）
+  3. **`protected`**（保护继承）
 
 **教材示例代码**
 ```cpp
@@ -122,12 +125,16 @@ struct Priv_Derv : private Base {
 
 **理论**
 * **派生访问说明符不影响派生类对其直接基类成员的访问能力**
-  * 无论使用public、private还是protected继承，Pub_Derv和Priv_Derv都可以访问prot_mem
-  * 两者都**不能**访问priv_mem
+  * 无论使用`public`、`private`还是`protected`继承，`Pub_Derv`和`Priv_Derv`都可以访问`prot_mem`
+  * 两者都**不能**访问`priv_mem`
 * **派生访问说明符的目的是控制派生类用户（包括从派生类进一步派生的类）对继承成员的访问**
-  * public继承：成员保持原有的访问级别
-  * private继承：基类所有成员在派生类中变为private
-  * protected继承：基类的public成员在派生类中变为protected，protected成员保持protected
+  * `public`继承：成员保持原有的访问级别
+  * `private`继承：基类所有成员在派生类中变为`private`
+  * `protected`继承：基类的`public`成员在派生类中变为`protected`，`protected`成员保持`protected`
+
+**注意点**
+* ⚠️ **重要区别**：继承访问说明符改变的是**继承后的可见性**，而不是**继承时的访问能力**
+* 📋 **术语**：**derivation access specifier**（派生访问说明符）与**access specifier**（成员访问说明符）是两个不同层面的概念
 
 **教材示例代码**
 ```cpp
@@ -138,9 +145,7 @@ d1.pub_mem();    // ok: pub_mem is public in the derived class
 d2.pub_mem();    // error: pub_mem is private in the derived class
 ```
 
-**注意点**
-* ⚠️ **重要区别**：继承访问说明符改变的是**继承后的可见性**，而不是**继承时的访问能力**
-* 📋 **术语**：**derivation access specifier**（派生访问说明符）与**access specifier**（成员访问说明符）是两个不同层面的概念
+
 
 ---
 
