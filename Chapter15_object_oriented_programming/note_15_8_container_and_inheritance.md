@@ -150,9 +150,13 @@ private:
 
 **理论**
 * **核心主旨总结**：
-    * `multiset` 中的元素是 `shared_ptr`，而 `shared_ptr` 没有定义小于运算符(`<`)。
-    * 因此，我们必须提供自己的比较操作来对元素进行排序（`§11.2.2`）。
-* **实现细节**：定义了一个名为 `compare` 的**私有静态成员**，比较 `shared_ptr` 指向的对象的ISBN。通过类内初始化器(in-class initializer)（`§7.3.1, p. 274`）初始化 `multiset` 以使用此比较函数。
+    1. `multiset` 中的元素是 `shared_ptr`，而 `shared_ptr` 没有定义小于运算符(`<`)。
+    2. 因此，我们必须提供自己的比较操作来对元素进行排序（`§11.2.2`）。
+    3. 对此我们定义了一个名为 `compare` 的**私有静态成员**，比较 `shared_ptr` 指向的对象的ISBN。
+* **实现细节**：
+    * **静态声明**：`compare` 声明为 `static` 因为它不依赖于类的特定对象实例。
+    * **`{}`初始化**：通过类内初始化器（`§7.3.1`）初始化 `multiset` 以使用此比较函数。
+    * **类型推导**：使用 `decltype(compare)*` 获取函数指针类型
 
 **教材示例代码**
 ```cpp
@@ -162,9 +166,11 @@ std::multiset<std::shared_ptr<Quote>, decltype(compare)*>
 ```
 
 **注意点**
-* 🔧 **声明解析**：从左到右阅读，`items` 是一个 `multiset`，元素类型为 `shared_ptr<Quote>`，使用与 `compare` 成员类型相同的函数进行排序，名为 `items`，使用 `compare` 函数初始化
-* 📋 **静态成员**：`compare` 声明为 `static` 因为它不依赖于类的特定对象实例
-* 💡 **类型推导**：使用 `decltype(compare)*` 获取函数指针类型
+* 🔧 **声明解析**：从左到右阅读，`items` 是一个 `multiset`，
+    * 元素类型为 `shared_ptr<Quote>`
+    * 使用与 `compare` 成员类型相同的函数进行排序，名为 `items`，使用 `compare` 函数初始化
+
+
 
 ---
 
@@ -172,16 +178,24 @@ std::multiset<std::shared_ptr<Quote>, decltype(compare)*>
 ## ✅ 知识点7: 定义`Basket`的成员-`add_item`与`total_receipt`
 
 **理论**
-* **核心主旨总结**：`Basket` 类只定义了两个操作。`add_item` 成员在类内定义，接受一个指向动态分配 `Quote` 的 `shared_ptr` 并将其插入 `multiset`。第二个成员 `total_receipt` 打印购物篮内容的明细账单并返回所有物品的总价。
+* **核心主旨总结**：`Basket` 类只定义了两个操作:
+    1. `add_item` 成员在类内定义，接受一个指向动态分配 `Quote` 的 `shared_ptr` 并将其插入 `multiset`。
+    2. 第二个成员 `total_receipt` 打印购物篮内容的明细账单并返回所有物品的总价。
 
 **注意点**
-* 📋 **接口设计**：`add_item` 直接暴露 `shared_ptr` 接口，用户需要处理动态内存分配（如使用 `make_shared`）
-* 🔄 **后续改进**：后面会讨论如何隐藏指针，让用户直接使用对象而不必处理内存管理
+* 📋 **接口设计**：
+`add_item` 直接暴露 `shared_ptr` 接口，用户需要处理动态内存分配（如使用 `make_shared`）
+
 
 ---
 
 <a id="id8"></a>
-## ✅ 知识点8: total_receipt函数实现与批量处理
+## ✅ 知识点8: `total_receipt`函数实现与批量处理
+
+**理论**
+* **核心逻辑**：
+    * `total_receipt` 通过迭代 `multiset` 来累积总价。
+    * 对于每个不同的ISBN，它调用 `print_total` 打印该书籍的明细，并将该书籍的总价加到 `sum` 中。
 
 **教材示例代码**
 ```cpp
@@ -202,30 +216,32 @@ double Basket::total_receipt(ostream &os) const
 }
 ```
 
-**理论**
-* **核心逻辑**：`total_receipt` 通过迭代 `multiset` 来累积总价。对于每个不同的ISBN，它调用 `print_total` 打印该书籍的明细，并将该书籍的总价加到 `sum` 中。
 
-**注意点**
-* 📋 **迭代器使用**：`iter` 初始化为 `items.cbegin()`，条件检查是否等于 `items.cend()`
-* 🔧 **解引用操作**：`**iter` 是 `Quote` 对象（或派生自 `Quote` 的类型）。第一次解引用得到 `shared_ptr`，第二次解引用得到实际对象
-* 📋 **计数函数**：使用 `multiset` 的 `count` 成员（`§11.3.5, p. 436`）确定具有相同键（即相同ISBN）的元素数量
+
+**代码解析**
+* **迭代器使用**：`iter` 初始化为 `items.cbegin()`，条件检查是否等于 `items.cend()`
+* **解引用操作**：`**iter` 是 `Quote` 对象（或派生自 `Quote` 的类型）。第一次解引用得到 `shared_ptr`，第二次解引用得到实际对象
+* **计数函数**：使用 `multiset` 的 `count` 成员（`§11.3.5`）确定具有相同键（即相同ISBN）的元素数量
 
 ---
 
 <a id="id9"></a>
-## ✅ 知识点9: upper_bound与循环增量控制
+## ✅ 知识点9: `upper_bound`与循环增量控制
 
 **理论**
-* **核心主旨总结**：`for` 循环的"增量"表达式很有意思。与通常读取每个元素的循环不同，这里通过调用 `upper_bound`（`§11.3.5, p. 438`）将 `iter` 推进到下一个键。`upper_bound` 调用返回指向最后一个具有与 `iter` 相同键的元素之后那个元素的迭代器，即跳过所有与当前键匹配的元素，直接指向下一个不同的书籍或集合末尾。
+* **核心主旨总结**：
+    * `for` 循环的"增量"表达式很有意思。
+    * 与通常读取每个元素的循环不同，这里通过调用 `upper_bound`（`§11.3.5`）将 `iter` 推进到下一个键。
+    * `upper_bound` 调用返回指向最后一个具有与 `iter` 相同键的元素之后的那个元素的迭代器，即跳过所有与当前键匹配的元素，直接指向下一个不同的书籍或集合末尾。
 
 **注意点**
 * 💡 **算法技巧**：这种循环结构允许我们**批量处理**具有相同键的元素（同一本书的多个副本），而不是逐个处理每个元素
-* 🔄 **知识关联**：`upper_bound` 是关联容器的重要操作，用于查找键的范围
+
 
 ---
 
 <a id="id10"></a>
-## ✅ 知识点10: print_total函数与虚调用
+## ✅ 知识点10: `print_total`函数与虚调用
 
 **教材示例代码**
 ```cpp
