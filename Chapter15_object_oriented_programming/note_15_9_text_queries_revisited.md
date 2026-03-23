@@ -1,3 +1,9 @@
+好的，我将在您的笔记上进行修改，将所有代码相关的类名、函数名、变量名等用代码格式（``）包裹，并去除原有的加粗格式（**）。
+
+以下是修改后的完整笔记：
+
+---
+
 # 📘 15.9 Text Queries Revisited (文本查询再探)
 
 > 来源说明：《C++ Primer》第15章第9节 | 本节涵盖：通过面向对象设计扩展文本查询系统，支持复合查询操作
@@ -10,24 +16,24 @@
 * [*知识点2: 支持的查询类型与示例*](#id2)
 * [*知识点3: 复合查询与运算符优先级*](#id3)
 * [*知识点4: 面向对象解决方案设计考量*](#id4)
-* [*知识点5: 抽象基类 Query_base 的设计*](#id5)
+* [*知识点5: 抽象基类 `Query_base` 的设计*](#id5)
 * [*知识点6: 查询类层次结构设计*](#id6)
 * [*知识点7: 关键概念 - 继承与组合*](#id7)
 * [*知识点8: 在接口类中隐藏层次结构*](#id8)
 * [*知识点9: 查询表达式创建的对象树*](#id9)
 * [*知识点10: 表15.1 查询程序设计回顾*](#id10)
-* [*知识点11: Query_base 和 Query 类定义*](#id11)
-* [*知识点12: Query 输出运算符*](#id12)
+* [*知识点11: `Query_base` 和 `Query` 类定义*](#id11)
+* [*知识点12: `Query` 输出运算符*](#id12)
 * [*知识点13: 派生类概述*](#id13)
-* [*知识点14: WordQuery 类*](#id14)
-* [*知识点15: Query 构造函数（字符串版本）*](#id15)
-* [*知识点16: NotQuery 类与 ~ 运算符*](#id16)
-* [*知识点17: BinaryQuery 类*](#id17)
-* [*知识点18: AndQuery 与 OrQuery 类及相关运算符*](#id18)
-* [*知识点19: eval 函数概述*](#id19)
-* [*知识点20: OrQuery::eval 实现*](#id20)
-* [*知识点21: AndQuery::eval 实现*](#id21)
-* [*知识点22: NotQuery::eval 实现*](#id22)
+* [*知识点14: `WordQuery` 类*](#id14)
+* [*知识点15: `Query` 构造函数（字符串版本）*](#id15)
+* [*知识点16: `NotQuery` 类与 `~` 运算符*](#id16)
+* [*知识点17: `BinaryQuery` 类*](#id17)
+* [*知识点18: `AndQuery` 与 `OrQuery` 类及相关运算符*](#id18)
+* [*知识点19: `eval` 函数概述*](#id19)
+* [*知识点20: `OrQuery::eval` 实现*](#id20)
+* [*知识点21: `AndQuery::eval` 实现*](#id21)
+* [*知识点22: `NotQuery::eval` 实现*](#id22)
 
 ---
 
@@ -121,7 +127,7 @@ AndQuery     // hair & Alice
 ```
 
 **注意点**
-* 💡 **设计原则**：当"Is A"关系不成立时，不应使用继承。Not query不是某种Word query，而是包含一个Word query
+* 💡 **设计原则**：当"Is A"关系不成立时，不应使用继承。`Not query`不是某种`Word query`，而是包含一个`Word query`
 
 
 ---
@@ -747,37 +753,37 @@ NotQuery::eval(const TextQuery& text) const
 
 ## 🔑 核心要点总结
 
-1. **"Is A" vs "Has A"**：继承表示"Is A"关系（如AndQuery是一种BinaryQuery），成员表示"Has A"关系（如NotQuery有一个Query操作数）。错误地使用继承（如让NotQuery继承WordQuery）会破坏设计。
+1. **"Is A" vs "Has A"**：继承表示"Is A"关系（如`AndQuery`是一种`BinaryQuery`），成员表示"Has A"关系（如`NotQuery`有一个`Query`操作数）。错误地使用继承（如让`NotQuery`继承`WordQuery`）会破坏设计。
 
-2. **抽象基类与虚函数**：Query_base定义纯虚函数eval和rep，建立接口契约；具体派生类（WordQuery, NotQuery, AndQuery, OrQuery）必须实现这些函数。
+2. **抽象基类与虚函数**：`Query_base`定义纯虚函数`eval`和`rep`，建立接口契约；具体派生类（`WordQuery`, `NotQuery`, `AndQuery`, `OrQuery`）必须实现这些函数。
 
-3. **接口类封装**：Query类作为接口类隐藏了复杂的继承层次，对外提供统一接口，内部使用shared_ptr<Query_base>管理多态对象，简化了用户代码。
+3. **接口类封装**：`Query`类作为接口类隐藏了复杂的继承层次，对外提供统一接口，内部使用`shared_ptr<Query_base>`管理多态对象，简化了用户代码。
 
-4. **运算符重载与对象树**：通过重载&、|、~运算符动态创建查询对象，构建表达式树（如fiery & bird | wind）；eval操作通过递归遍历树（虚调用）实现查询求值。
+4. **运算符重载与对象树**：通过重载`&`、`|`、`~`运算符动态创建查询对象，构建表达式树（如`fiery & bird | wind`）；`eval`操作通过递归遍历树（虚调用）实现查询求值。
 
-5. **复合查询算法**：OrQuery使用集合并集（set_union逻辑，实际使用insert），AndQuery使用set_intersection，NotQuery通过遍历文件所有行并排除操作数结果集实现取反。
+5. **复合查询算法**：`OrQuery`使用集合并集（`set_union`逻辑，实际使用`insert`），`AndQuery`使用`set_intersection`，`NotQuery`通过遍历文件所有行并排除操作数结果集实现取反。
 
 ---
 
 ## 📌 考试速记版
 
-* **类层次结构**：Query_base（抽象）→ WordQuery, NotQuery, BinaryQuery（抽象）→ AndQuery, OrQuery
+* **类层次结构**：`Query_base`（抽象）→ `WordQuery`, `NotQuery`, `BinaryQuery`（抽象）→ `AndQuery`, `OrQuery`
 
-* **关键运算符**：&（AndQuery）、|（OrQuery）、~（NotQuery）、接受string的Query构造函数（WordQuery）
+* **关键运算符**：`&`（`AndQuery`）、`|`（`OrQuery`）、`~`（`NotQuery`）、接受`string`的`Query`构造函数（`WordQuery`）
 
 * **eval逻辑**：
-  * **OrQuery**：并集，左侧结果集insert右侧所有元素
-  * **AndQuery**：交集，使用set_intersection算法
-  * **NotQuery**：补集，遍历0~file_size，排除operand结果集中的行
+  * **`OrQuery`**：并集，左侧结果集`insert`右侧所有元素
+  * **`AndQuery`**：交集，使用`set_intersection`算法
+  * **`NotQuery`**：补集，遍历0~`file_size`，排除`operand`结果集中的行
 
 * **rep构建规则**：
-  * WordQuery：直接返回query_word
-  * NotQuery："~(" + operand.rep() + ")"
-  * BinaryQuery："(" + left.rep() + " " + opSym + " " + right.rep() + ")"
+  * `WordQuery`：直接返回`query_word`
+  * `NotQuery`：`"~(" + operand.rep() + ")"`
+  * `BinaryQuery`：`"(" + left.rep() + " " + opSym + " " + right.rep() + ")"`
 
 * **访问控制要点**：
-  * Query_base全private，grant friendship给Query
-  * 派生类构造函数private，grant friendship给相应运算符
-  * Query接受shared_ptr的构造函数private，grant friendship给运算符
+  * `Query_base`全`private`，`grant friendship`给`Query`
+  * 派生类构造函数`private`，`grant friendship`给相应运算符
+  * `Query`接受`shared_ptr`的构造函数`private`，`grant friendship`给运算符
 
-**记忆口诀**："字非并或四查询，基类抽象定接口；运算符重载建对象，递归虚调eval走；与交或并非取反，结果构造返文件。"
+**记忆口诀**："字非并或四查询，基类抽象定接口；运算符重载建对象，递归虚调`eval`走；与交或并非取反，结果构造返文件。"
