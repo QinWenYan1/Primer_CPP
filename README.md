@@ -8,32 +8,59 @@
 
 ## 📑 目录
 
-- [📘 关于《C++ Primer》](#关于-c-primer)
+- [📖 关于《C++ Primer》与章节导航](#-关于c-primer与章节导航)
 - [🗂️ 仓库结构](#️-仓库结构)
 - [📋 C++学习小节笔记生成指南（大模型专用）](#-c-学习小节笔记生成指南大模型专用)
 - [📋 C++章节总结笔记生成指南（大模型专用）](#-c-章节总结笔记生成指南大模型专用)
 - [📋 C++exercise纠错评分生成指南（大模型专用）](#-c-exercise纠错评分生成指南大模型专用)
 
 ---
-<a id="关于-c-primer"></a>
-## 📖 关于《C++ Primer》
+## 📖 关于《C++ Primer》与章节导航
 
-- 作者：Stanley B. Lippman, Josée Lajoie, Barbara E. Moo  
-- 第五版是最广泛使用的版本，内容涵盖现代 C++（C++11）特性  
-- 适合具备 C 基础或初识 C++ 的学习者深入进阶
+<details>
+<summary><b>👉 点击展开</b></summary>
 
-书中内容覆盖：
-- C++ 基础语法与数据类型
-- 引用、函数、类与对象
-- 构造函数、拷贝控制与运算符重载
-- 模板与泛型编程
-- 标准库（如 `vector`, `map`, `string`）
-- 输入输出流、异常处理、文件操作
-- 新标准特性（`auto`, `range-based for`, `nullptr`, `move semantics`, 等）
+**书籍信息**
+* 作者：Stanley B. Lippman, Josée Lajoie, Barbara E. Moo
+* 第五版是最广泛使用的版本，内容涵盖现代 C++（C++11）特性
+* 适合具备 C 基础或初识 C++ 的学习者深入进阶
+
+**书中内容覆盖：**
+* 从入门到精通，系统讲解 C++ 语法、类设计、STL 与 C++11 新特性
+
+---
+
+### 📚 章节导航
+
+#### 第一部分：基础
+- [第 1 章：开始](./Chapter01_get_started/README.md) — 编译运行、I/O、控制流、初识类
+- [第 2 章：变量和基本类型](./Chapter02_variable_type/README.md)
+- [第 3 章：字符串、向量和数组](./Chapter03_String_Vector_Array/README.md)
+- [第 4 章：表达式](./Chapter04_expression/README.md)
+- [第 5 章：语句](./Chapter05_statement/README.md)
+- [第 6 章：函数](./Chapter06_functions/README.md)
+- [第 7 章：类](./Chapter07_classes/README.md)
+
+#### 第二部分：标准库
+- [第 8 章：IO 库](./Chapter08_IO_library/README.md)
+- [第 9 章：顺序容器](./Chapter09_sequential_containers/README.md)
+- [第 10 章：泛型算法](./Chapter10_generic_algorithms/README.md)
+- [第 11 章：关联容器](./Chapter11_associative_containers/README.md)
+- [第 12 章：动态内存](./Chapter12_dynamic_memory/README.md)
+
+#### 第三部分：类和面向对象
+- [第 13 章：拷贝控制](./Chapter13_copy_control/README.md)
+- [第 14 章：重载运算与类型转换](./Chapter14_overloaded_operations_and_conversions/README.md)
+- [第 15 章：面向对象程序设计](./Chapter15_object_oriented_programming/README.md)
+
+</details>
 
 ---
 <a id="-仓库结构"></a>
 ## 🗂️ 仓库结构
+
+<details>
+<summary><b>👉 点击展开</b></summary>
 
 ```bash
 .
@@ -51,9 +78,15 @@
 ├── summary_notes/               # 总结笔记（选填）
 ├── README.md
 ```
+
+</details>
+
 ---
 <a id="-c-学习小节笔记生成指南大模型专用"></a>
 ## 📋 C++学习小节笔记生成指南（大模型专用）
+
+<details>
+<summary><b>👉 点击展开</b></summary>
 
 
 ```markdown 
@@ -390,9 +423,14 @@
 
     这个优化版指南专注于生成**严格按原文顺序、内容完整、清晰简洁、术语准确**的学习笔记，特别适合需要深入学习C++等技术内容的场景。
 ```
+</details>
+
 ---
 <a id="-c-章节总结笔记生成指南大模型专用"></a>
 ## 📋 C++章节总结笔记生成指南（大模型专用）
+
+<details>
+<summary><b>👉 点击展开</b></summary>
 
 ```markdown 
 
@@ -604,9 +642,14 @@
     通过遵循本指南，AI助手可以系统化地创建高质量章节笔记，真正帮助用户节省学习时间，提高知识获取效率。
 
 ```
+</details>
+
 ---
 <a id="-c-exercise纠错评分生成指南大模型专用"></a>
 ## 📋 C++exercise纠错评分生成指南（大模型专用）
+
+<details>
+<summary><b>👉 点击展开</b></summary>
 
 ```markdown
 
@@ -973,3 +1016,4 @@
 
 
 ```
+</details>
