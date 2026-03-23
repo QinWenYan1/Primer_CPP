@@ -427,16 +427,17 @@ class WordQuery: public Query_base {
   * `rep`返回此`WordQuery`表示的`string`（即 `query_word`）
 
 **注意点**
-* 📋 **具体类(Concrete Class)**：WordQuery是具体类，实现了所有纯虚函数，可以创建对象
-* 💡 **唯一执行者**：WordQuery是唯一真正访问TextQuery数据的类，其他查询类都是在此基础上组合
+* 📋 **具体类(Concrete Class)**：`WordQuery`是具体类，实现了所有纯虚函数，可以创建对象
+* 💡 **唯一执行者**：`WordQuery`是唯一真正访问`TextQuery`数据的类，其他查询类都是在此基础上组合，也就是在原始数据`WordQuery`上在进行提炼
+
 
 ---
 
 <a id="id15"></a>
-## ✅ 知识点15: Query 构造函数（字符串版本）
+## ✅ 知识点15: `Query`构造函数（字符串版本）
 
 **理论**
-* 定义了 **WordQuery** 类后，现在可以定义接受 **string** 的 **Query** 构造函数
+* 定义了 `WordQuery`类后，现在可以定义接受`string`的`Query`构造函数
 
 **构造函数实现**
 ```cpp
@@ -444,11 +445,11 @@ inline
 Query::Query(const std::string &s): q(new WordQuery(s)) { }
 ```
 
-* 此构造函数分配 **WordQuery** 并将其指针成员初始化为指向新分配的对象
+* 此构造函数分配`WordQuery`并将其指针成员初始化为指向新分配的对象
 
 **注意点**
-* 💡 **隐式转换**：接受string的Query构造函数允许从string隐式转换为Query对象
-* ⚠️ **动态分配**：使用new动态分配WordQuery对象，由shared_ptr管理
+* 💡 **隐式转换**：接受`string`的`Query`构造函数允许从`string`隐式转换为`Query`对象
+* ⚠️ **动态分配**：使用`new`动态分配`WordQuery`对象，由`shared_ptr`管理
 
 ---
 
@@ -456,7 +457,7 @@ Query::Query(const std::string &s): q(new WordQuery(s)) { }
 ## ✅ 知识点16: NotQuery 类与 ~ 运算符
 
 **理论**
-* **~ 运算符**生成 **NotQuery**，它持有并对其取反的 **Query**
+* `~`运算符生成`NotQuery`，它持有并对其取反的`Query`
 
 **NotQuery 类定义**
 ```cpp
@@ -475,15 +476,15 @@ inline Query operator~(const Query &operand)
 ```
 
 **实现细节**
-* 因为 **NotQuery** 的成员都是 **private**，首先将 **~ 运算符**设为友元
-* 为了表示 **NotQuery**，将 **~** 符号与底层 **Query** 的表示连接起来
-* 对输出加括号以确保优先级(precedence)对读者清晰
-* 值得注意的是，**NotQuery** 自己的 **rep** 成员中对 **rep** 的调用最终进行虚调用：
-  * **query.rep()** 是对 **Query** 类 **rep** 成员的非虚调用
-  * **Query::rep** 调用 **q->rep()**，这是通过其 **Query_base** 指针的虚调用
-* **~ 运算符**动态分配新的 **NotQuery** 对象
-* 返回（隐式）使用接受 **shared_ptr<Query_base>** 的 **Query** 构造函数
-* 即，**return** 语句等价于：
+* 因为`NotQuery`的成员都是 `private`，首先将`~`运算符设为友元
+* 为了表示`NotQuery`，将`~`符号与底层`Query`的表示连接起来
+* 对输出加括号以确保优先级对读者清晰
+* 值得注意的是，`NotQuery`自己的 `rep`成员中对`rep`的调用最终进行虚调用：
+  * `query.rep()`是对`Query`类`rep`成员的非虚调用
+  * `Query::rep`调用`q->rep()`，这是通过其`Query_base`指针的虚调用
+* `~`运算符动态分配新的`NotQuery`对象
+* 返回（隐式）使用接受 `shared_ptr<Query_base>` 的 `Query`构造函数
+* 即，`return`语句等价于：
 ```cpp
 // 分配新的NotQuery对象
 // 将生成的NotQuery指针绑定到shared_ptr<Query_base>
@@ -492,19 +493,19 @@ return Query(tmp); // 使用接受shared_ptr的Query构造函数
 ```
 
 **注意点**
-* ⚠️ **运算符友元**：需要将operator~设为友元以访问private构造函数
-* 💡 **字符串构建**：rep()构建带括号的字符串表示，如"~(Alice)"
-* 🔄 **递归表示**：query.rep()会调用实际Query对象的rep，形成递归构建
+* ⚠️ **运算符友元**：需要将`operator~`设为友元以访问`private`构造函数
+* 💡 **字符串构建**：`rep()`构建带括号的字符串表示，如"`~(Alice)`"
+* 🔄 **递归表示**：`query.rep()`会调用实际`Query`对象的`rep`，形成递归构建
 
 ---
 
 <a id="id17"></a>
-## ✅ 知识点17: BinaryQuery 类
+## ✅ 知识点17: `BinaryQuery`类
 
 **理论**
-* **BinaryQuery** 类是一个**抽象基类(abstract base class)**，保存需要两个操作数的查询类型所需的数据
+* `BinaryQuery`类是一个**抽象基类**，保存需要两个操作数的查询类型所需的数据
 
-**BinaryQuery 类定义**
+**`BinaryQuery`类定义**
 ```cpp
 class BinaryQuery: public Query_base {
 protected:
@@ -519,29 +520,29 @@ protected:
 };
 ```
 
-* **BinaryQuery** 中的数据是两个 **Query** 操作数和相应的运算符符号(operator symbol)
+* `BinaryQuery`中的数据是两个 `Query`操作数和相应的运算符符号
 * 构造函数接受两个操作数和运算符符号，每个都存储在相应的数据成员中
-* 为了表示 **BinaryOperator**，生成由左操作数的表示、后跟运算符、后跟右操作数的表示组成的带括号表达式(parenthesized expression)
-* 与显示 **NotQuery** 时一样，对 **rep** 的调用最终对 **lhs** 和 **rhs** 指向的 **Query_base** 对象的 **rep** 函数进行虚调用
+* 为了表示`BinaryOperator`，生成由左操作数的表示、后跟运算符、后跟右操作数的表示组成的带括号表达式
+* 与显示`NotQuery`时一样，对 `rep`的调用最终对`lhs`和`rhs`指向的`Query_base`对象的`rep`函数进行虚调用
 
 **注意**
-* **BinaryQuery** 类没有定义 **eval** 函数，因此继承了一个纯虚函数
-* 因此，**BinaryQuery** 也是一个抽象基类，**不能创建 BinaryQuery 类型的对象**
+* `BinaryQuery`类没有定义 `eval`函数，因此继承了一个纯虚函数
+* 因此，`BinaryQuery`也是一个抽象基类，**不能创建`BinaryQuery`类型的对象**
 
 **注意点**
-* ⚠️ **抽象类**：BinaryQuery不实现eval，保持抽象，强制派生类必须实现eval
-* 📋 **数据成员**：lhs（左操作数），rhs（右操作数），opSym（运算符符号）
-* 💡 **rep实现**：BinaryQuery实现了rep，派生类继承此实现即可
+* ⚠️ **抽象类**：`BinaryQuery`不实现`eval`，保持抽象，强制派生类必须实现`eval`
+* 📋 **数据成员**：`lhs`，`rhs`，`opSym`
+* 💡 **rep实现**：`BinaryQuery`实现了`rep`，派生类继承此实现即可
 
 ---
 
 <a id="id18"></a>
-## ✅ 知识点18: AndQuery 与 OrQuery 类及相关运算符
+## ✅ 知识点18: `AndQuery`与 `OrQuery`类及相关运算符
 
 **理论**
-* **AndQuery** 和 **OrQuery** 类（及其相应的运算符）彼此非常相似
+* `AndQuery`和`OrQuery`类（及其相应的运算符）彼此非常相似
 
-**AndQuery 类定义**
+**`AndQuery`类定义**
 ```cpp
 class AndQuery: public BinaryQuery {
     friend Query operator&(const Query&, const Query&);
@@ -556,7 +557,7 @@ inline Query operator&(const Query &lhs, const Query &rhs)
 }
 ```
 
-**OrQuery 类定义**
+**`OrQuery`类定义**
 ```cpp
 class OrQuery: public BinaryQuery {
     friend Query operator|(const Query&, const Query&);
@@ -571,48 +572,48 @@ inline Query operator|(const Query &lhs, const Query &rhs)
 ```
 
 **实现细节**
-* 这些类使相应的运算符成为友元，并定义构造函数以使用适当的运算符创建其 **BinaryQuery** 基部分
-* 它们继承 **BinaryQuery** 的 **rep** 定义，但每个都**覆盖(overrides)** **eval** 函数
-* 像 **~ 运算符**一样，**&** 和 **|** 运算符返回绑定到新分配对象的 **shared_ptr**
-* 该 **shared_ptr** 在每个这些运算符的 **return** 语句中作为 **Query** 的一部分被转换
+* 这些类使相应的运算符成为友元，并定义构造函数以使用适当的运算符创建其`BinaryQuery`基部分
+* 它们继承`BinaryQuery`的 `rep`定义，但每个都**覆盖** 了`eval`函数
+* 像`~`运算符一样，`&`和 `|`运算符返回绑定到新分配对象的 `shared_ptr`
+* 该 `shared_ptr`在每个这些运算符的`return`语句中作为`Query`的一部分被转换
 
 **注意点**
-* 📋 **覆盖(override)**：AndQuery和OrQuery继承rep但覆盖eval，实现不同的查询逻辑
-* 💡 **友元运算符**：运算符需要是友元以访问private构造函数
-* ⚠️ **返回值转换**：shared_ptr<Query_base>自动转换为Query对象（通过Query的private构造函数，需要友元）
+* 📋 **覆盖**：`AndQuery`和`OrQuery`继承`rep`但覆盖`eval`，实现不同的查询逻辑
+* 💡 **友元运算符**：运算符需要是友元以访问`private`构造函数
+* ⚠️ **返回值转换**：`shared_ptr<Query_base>`自动转换为`Query`对象（通过`Query`的`private`构造函数，需要友元）
 
 ---
 
 <a id="id19"></a>
-## ✅ 知识点19: eval 函数概述
+## ✅ 知识点19: `eval`函数概述
 
 **理论**
-* **eval 函数**是查询系统的核心
-* 这些函数中的每一个都对其操作数调用 **eval**，然后应用自己的逻辑：
-  * **OrQuery** 的 **eval** 操作返回其两个操作数结果的**并集(union)**
-  * **AndQuery** 返回**交集(intersection)**
-  * **NotQuery** 更复杂：它必须返回**不在其操作数集合中的行号**
+* **`eval`函数**是查询系统的核心
+* 这些函数中的每一个都对其操作数调用 `eval`，然后应用自己的逻辑：
+  * `OrQuery` 的 `eval`操作返回其两个操作数结果的**并集**
+  * `AndQuery` 返回**交集**
+  * `NotQuery` 更复杂：它必须返回**不在其操作数集合中的行号**
 
-**QueryResult 支持**
-* 为了支持 **eval** 函数中的处理，需要使用 **QueryResult** 的版本，该版本定义了在 **§12.3.2**（第490页）的练习中添加的成员
-* 假设 **QueryResult** 具有 **begin** 和 **end** 成员，允许遍历 **QueryResult** 保存的行号集合
-* 还假设 **QueryResult** 有一个名为 **get_file** 的成员，返回指向执行查询的底层文件的 **shared_ptr**
+**`QueryResult`支持**
+* 为了支持`eval`函数中的处理，需要使用 `QueryResult`的版本，该版本定义了在`§12.3.2`的练习中添加的成员
+* 假设`QueryResult`具有 `begin`和`end`成员，允许遍历`QueryResult`保存的行号集合
+* 还假设 `QueryResult`有一个名为 `get_file`的成员，返回指向执行查询的底层文件的 `shared_ptr`
 
 **警告**
-* ⚠️ **前置条件**：Query 类使用在 **§12.3.2**（第490页）的练习中为 **QueryResult** 定义的成员
+* ⚠️ **前置条件**：`Query`类使用在 **§12.3.2**的练习中为 **`QueryResult`** 定义的成员
 
 ---
 
 <a id="id20"></a>
-## ✅ 知识点20: OrQuery::eval 实现
+## ✅ 知识点20: `OrQuery::eval` 实现
 
 **理论**
-* **OrQuery** 表示其两个操作数结果的并集(union)，通过对每个操作数调用 **eval** 获得
-* 因为这些操作数是 **Query** 对象，调用 **eval** 是对 **Query::eval** 的调用，后者又进行虚调用到基础 **Query_base** 对象的 **eval**
-* 这些调用中的每一个都产生一个 **QueryResult**，表示其操作数出现的行号
+* `OrQuery`表示其两个操作数结果的并集，通过对每个操作数调用 `eval`获得
+* 因为这些操作数是`Query`对象，调用`eval`是对`Query::eval`的调用，后者又进行虚调用到基础 `Query_base`对象的`eval`
+* 这些调用中的每一个都产生一个 `QueryResult`，表示其操作数出现的行号
 * 将这些行号组合成一个新集合
 
-**OrQuery::eval 代码逻辑**
+**`OrQuery::eval` 代码逻辑**
 ```cpp
 // 返回其操作数结果集的并集
 QueryResult
