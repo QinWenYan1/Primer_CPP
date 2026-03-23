@@ -183,7 +183,7 @@ Query_base (抽象基类)
     * 在设计良好的类层次结构中，公开派生类的对象可以在需要基类对象的任何地方使用。
 * **"Has A"关系**：
     * 类型之间的另一种常见关系是"Has A"关系。
-    * 通过"Has A"关系相关的类型意味着成员资格。
+    * 通过"Has A"关系相关的类型意味着应设计为类中的成员。
 * 在书店示例中:
     * 基类代表以规定价格出售的书籍报价概念。
     * `Bulk_quote`"是一种(Is A)"报价，但具有不同的定价策略。
@@ -199,31 +199,31 @@ Query_base (抽象基类)
 ## ✅ 知识点8: 在接口类中隐藏层次结构
 
 **理论**
-* 程序将处理评估查询，而不是构建查询(building them)。然而，为了能够运行程序，需要能够创建查询
+* 程序将处理评估查询，而不是构建查询。然而，为了能够运行程序，需要能够创建查询
 * 最简单的方法是编写C++表达式来创建查询。例如，希望通过编写如下代码生成前面描述的复合查询：
-```cpp
-Query q = Query("fiery") & Query("bird") | Query("wind");
-```
+    ```cpp
+    Query q = Query("fiery") & Query("bird") | Query("wind");
+    ```
 
 **接口类设计**
-* 问题描述隐含表明用户级代码不会直接使用继承的类
-* 相反，定义一个名为 **Query** 的**接口类(interface class)**来隐藏层次结构
-* **Query** 类将存储指向 **Query_base** 的指针(pointer)
-* 该指针将绑定到从 **Query_base** 派生的类型的对象
-* **Query** 类将提供与 **Query_base** 类相同的操作：**eval** 用于评估关联查询，**rep** 用于生成查询的字符串版本
-* 它还将定义一个**重载的输出运算符(overloaded output operator)**来显示关联查询
+* 问题描述隐含表明**用户级代码不会直接使用继承的类**
+* 相反，定义一个名为`Query`的**接口类**来隐藏层次结构
+    * `Query`类将存储指向 `Query_base`的指针
+    * 该指针将绑定到从`Query_base`派生的类型的对象
+    * `Query`类将提供与`Query_base`类相同的操作：`eval`用于评估关联查询，`rep`用于生成查询的字符串版本
+    * 它还将定义一个**重载的输出运算符**来显示关联查询
 
-**运算符重载(Operator Overloading)设计**
-* 用户将通过 **Query** 对象上的操作间接创建和操作 **Query_base** 对象
-* 在 **Query** 对象上定义三个重载运算符：
-  * **& 运算符**：生成绑定到新 **AndQuery** 的 **Query**
-  * **| 运算符**：生成绑定到新 **OrQuery** 的 **Query**
-  * **~ 运算符**：生成绑定到新 **NotQuery** 的 **Query**
-* 接受 **string** 的 **Query** 构造函数将生成新的 **WordQuery**
+**运算符重载设计**
+* 用户将通过`Query`对象上的操作间接创建和操作`Query_base`对象
+* 在`Query`对象上定义三个重载运算符：
+  * `&`运算符：生成绑定到新 `AndQuery`的`Query`
+  * `|`运算符：生成绑定到新 `OrQuery`的`Query`
+  * `~`运算符：生成绑定到新 `NotQuery`的`Query`
+* 接受`string`的`Query`构造函数将生成新的`WordQuery`
 
 **注意点**
-* 📋 **设计模式**：接口类(Query) + 实现继承层次(Query_base)，这是一种常见的设计模式，封装了实现细节
-* 💡 **动态分配**：这些运算符函数将动态分配(dynamic allocate)从 **Query_base** 派生的类型的新对象
+* 📋 **设计模式**：接口类 + 实现继承层次，这是一种常见的设计模式，封装了实现细节
+* 💡 **动态分配**：这些运算符函数将动态分配从`Query_base`派生的类型的新对象
 
 ---
 
@@ -233,14 +233,14 @@ Query q = Query("fiery") & Query("bird") | Query("wind");
 **理论**
 * 重要的是要意识到应用程序中的大部分工作在于构建对象来表示用户的查询
 * 例如，上述表达式生成的相关对象集合如图15.3所示
-* 一旦对象树(object tree)建立，评估（或生成查询的表示）基本上是一个由编译器管理的过程，遵循这些链接，要求每个对象评估（或显示）自身
-* 例如，如果在 **q** 上调用 **eval**（即在树的根上），该调用要求 **OrQuery**（**q** 指向的对象）评估自身
-* 评估此 **OrQuery** 会对其两个操作数调用 **eval** —— 对 **AndQuery** 和查找单词 **wind** 的 **WordQuery**
-* 评估 **AndQuery** 会评估其两个 **WordQuery**，分别为单词 **fiery** 和 **bird** 生成结果
+* 一旦对象树建立，评估（或生成查询的表示）基本上是一个由编译器管理的过程，遵循这些链接，要求每个对象评估（或显示）自身
+* 例如，如果在`q`上调用`eval`（即在树的根上），该调用要求 `OrQuery`（`q`指向的对象）评估自身
+* 评估此`OrQuery`会对其两个操作数调用`eval`—— 对`AndQuery`和查找单词`win`的`WordQuery`
+* 评估`AndQuery`会评估其两个 `WordQuery`，分别为单词`fiery`和`bird`生成结果
 
 **注意点**
 * 💡 **递归评估**：查询评估是递归过程，从根节点向下遍历树结构
-* 🔄 **知识关联**：这是**组合模式(Composite Pattern)**的典型应用，统一处理单个对象和组合对象
+* 🔄 **知识关联**：这是<b>组合模式(Composite Pattern)</b>的典型应用，统一处理单个对象和组合对象
 
 ---
 
@@ -250,42 +250,41 @@ Query q = Query("fiery") & Query("bird") | Query("wind");
 **理论**
 * 表15.1总结了本示例中使用的类，包括接口类和实现类
 
-**查询程序接口类和操作(Query Program Interface Classes and Operations)**
+**查询程序接口类和操作**
 
 | 类/操作 | 描述 |
 |---------|------|
-| **TextQuery** | 读取给定文件并构建查找映射的类。该类具有一个查询操作，接受 **string** 参数并返回 **QueryResult**，表示该 **string** 出现的行（§12.3.2，第487页） |
-| **QueryResult** | 保存查询操作结果的类（§12.3.2，第489页） |
-| **Query** | 指向从 **Query_base** 派生的类型对象的接口类 |
-| **Query q(s)** | 将 **Query q** 绑定到持有 **string s** 的新 **WordQuery** |
-| **q1 & q2** | 返回绑定到持有 **q1** 和 **q2** 的新 **AndQuery** 对象的 **Query** |
-| **q1 \| q2** | 返回绑定到持有 **q1** 和 **q2** 的新 **OrQuery** 对象的 **Query** |
-| **~q** | 返回绑定到持有 **q** 的新 **NotQuery** 对象的 **Query** |
+| `TextQuery` | 读取给定文件并构建查找映射的类。该类具有一个查询操作，接受`string`参数并返回 `QueryResult`，表示该`string`出现的行（§12.3.2） |
+| `QueryResult` | 保存查询操作结果的类（§12.3.2） |
+| `Query` | 指向从`Query_base`派生的类型对象的接口类 |
+| `Query q(s)` | 将 `Query q` 绑定到持有 `string s` 的新 `WordQuery` |
+| `q1 & q2` | 返回绑定到持有 `q1` 和 `q2` 的新 `AndQuery` 对象的 `Query` |
+| `q1 \| q2` | 返回绑定到持有 `q1` 和 `q2` 的新 `OrQuery` 对象的 `Query` |
+| `~q` | 返回绑定到持有 `q` 的新 `NotQuery` 对象的 `Query` |
 
-**查询程序实现类(Query Program Implementation Classes)**
+**查询程序实现类**
 
 | 类 | 描述 |
 |-----|------|
-| **Query_base** | 查询类的抽象基类 |
-| **WordQuery** | 从 **Query_base** 派生的类，查找给定单词 |
-| **NotQuery** | 从 **Query_base** 派生的类，返回其 **Query** 操作数不出现的行集合 |
-| **BinaryQuery** | 从 **Query_base** 派生的抽象基类，表示具有两个 **Query** 操作数的查询 |
-| **OrQuery** | 从 **BinaryQuery** 派生的类，返回其两个操作数出现的行号的并集(union) |
-| **AndQuery** | 从 **BinaryQuery** 派生的类，返回其两个操作数出现的行号的交集(intersection) |
+| `Query_base` | 查询类的抽象基类 |
+| `WordQuery` | 从 `Query_base` 派生的类，查找给定单词 |
+| `NotQuery` | 从 `Query_base` 派生的类，返回其 `Query` 操作数不出现的行集合 |
+| `BinaryQuery` | 从 `Query_base` 派生的抽象基类，表示具有两个`Query`操作数的查询 |
+| `OrQuery` | 从 `BinaryQuery` 派生的类，返回其两个操作数出现的行号的并集 |
+| `AndQuery` | 从 `BinaryQuery` 派生的类，返回其两个操作数出现的行号的交集 |
 
 **注意点**
-* 📋 **表格重要性**：此表完整列出了整个查询系统的架构，是理解设计的关键参考
-* ⚠️ **区分接口与实现**：Query是用户接口，Query_base及派生类是实现细节
+* ⚠️ **区分接口与实现**：`Query`是用户接口，`Query_base`及派生类是实现细节
 
 ---
 
 <a id="id11"></a>
-## ✅ 知识点11: Query_base 和 Query 类定义
+## ✅ 知识点11: `Query_base` 和 `Query` 类定义
 
 **理论**
-* 从定义 **Query_base** 类开始实现
+* 从定义`Query_base`类开始实现
 
-**Query_base 类定义**
+`Query_base`类定义
 ```cpp
 // 抽象类作为具体查询类型的基类；所有成员都是私有的
 class Query_base {
@@ -301,17 +300,17 @@ private:
 };
 ```
 
-* **eval** 和 **rep** 都是**纯虚函数**，这使得 **Query_base** 成为抽象基类（§15.4，第610页）
-* 因为不打算让用户或派生类直接使用 **Query_base**，所以 **Query_base** 没有 **public** 成员
-* **Query_base** 的所有使用都将通过 **Query** 对象进行
-* 授予 **Query** 类友元(friendship)权限，因为 **Query** 的成员将调用 **Query_base** 中的虚函数
-* **protected** 成员 **line_no** 将在 **eval** 函数内部使用
-* 类似地，**析构函数(destructor)**是 **protected** 的，因为它被派生类的析构函数（隐式）使用
+* `eval`和`rep`都是**纯虚函数**，这使得`Query_base`成为抽象基类（§15.4）
+* 因为不打算让用户或派生类直接使用 `Query_base`，所以 `Query_base`没有`public`成员
+* `Query_base`的所有使用都将通过`Query`对象进行
+* 授予`Query`类友元权限，因为 `Query`的成员将调用 `Query_base`中的虚函数
+* `protected`成员`line_no`将在`eval`函数内部使用
+* 类似地，**析构函数**是 `protected`的，因为它被派生类的析构函数（隐式）使用
 
-**Query 类定义**
-* **Query** 类提供（并隐藏）**Query_base** 继承层次结构的接口
-* 每个 **Query** 对象将持有一个 **shared_ptr** 指向相应的 **Query_base** 对象
-* 因为 **Query** 是 **Query_base** 类的唯一接口，所以 **Query** 必须定义自己的 **eval** 和 **rep** 版本
+`Query`类定义: 
+* `Query`类提供（并隐藏）`Query_base`继承层次结构的接口
+* 每个`Query`对象将持有一个 `shared_ptr`指向相应的 `Query_base`对象
+* 因为`Query`是`Query_base`类的唯一接口，所以`Query`必须定义自己的`eval`和`rep`版本
 
 ```cpp
 // 管理Query_base继承层次结构的接口类
@@ -331,22 +330,21 @@ private:
 };
 ```
 
-* 接受 **string** 的 **Query** 构造函数将创建新的 **WordQuery** 并将其 **shared_ptr** 成员绑定到新创建的对象
-* **&**、**|** 和 **~** 运算符将分别创建 **AndQuery**、**OrQuery** 和 **NotQuery** 对象
-* 这些运算符将返回绑定到其新生成对象的 **Query** 对象
-* 为了支持这些运算符，**Query** 需要一个接受 **shared_ptr** 指向 **Query_base** 的构造函数并存储给定指针
-* 将此构造函数设为 **private**，因为不打算让一般用户代码定义 **Query_base** 对象
-* 因为此构造函数是私有的，所以需要将这些运算符设为**友元(friends)**
+* 接受`string`的`Query`构造函数将创建新的`WordQuery`并将其 `shared_ptr`成员绑定到新创建的对象
+* `&`、`|` 和 `~` 运算符将分别创建 `AndQuery`、`OrQuery` 和 `NotQuery` 对象
+* 这些运算符将返回绑定到其新生成对象的`Query`对象
+* 为了支持这些运算符，`Query` 需要一个接受`shared_ptr`指向 `Query_base`的构造函数并存储给定指针
+* 将此构造函数设为`private`，因为不打算让一般用户代码定义 `Query_base`对象
+* 因为此构造函数是私有的，所以需要将这些运算符设为`友元`
 
 **注意点**
-* ⚠️ **访问控制**：Query_base全是private，通过友元授予Query访问权限；Query的构造函数是private，通过友元授予运算符访问权限
-* 💡 **智能指针使用**：使用shared_ptr管理Query_base对象的生命周期，自动处理内存管理
-* 📋 **术语**：shared_ptr（共享指针），friend（友元），protected（受保护的）
+* ⚠️ **访问控制**：`Query_base`全是`private`，通过友元授予`Query`访问权限；`Query`的构造函数是`private`，通过友元授予运算符访问权限
+* 💡 **智能指针使用**：使用`shared_ptr`管理`Query_base`对象的生命周期，自动处理内存管理
 
 ---
 
 <a id="id12"></a>
-## ✅ 知识点12: Query 输出运算符
+## ✅ 知识点12: `Query`输出运算符
 
 **理论**
 * 输出运算符是整体查询系统工作原理的一个好例子
@@ -362,52 +360,51 @@ operator<<(std::ostream &os, const Query &query)
 ```
 
 **工作原理**
-* 当打印 **Query** 时，输出运算符调用 **Query** 类的 **rep** 成员
-* 该函数通过其指针成员对 **Query** 指向的对象的 **rep** 成员进行**虚调用(virtual call)**
+* 当打印`Query`时，输出运算符调用 `Query`类的`rep`成员
+* 该函数通过其指针成员对`Query`指向的对象的`rep`成员进行**虚调用**
 * 即，当写入以下代码时：
-```cpp
-Query andq = Query(sought1) & Query(sought2);
-cout << andq << endl;
-```
-* 输出运算符在 **andq** 上调用 **Query::rep**
-* **Query::rep** 通过其 **Query_base** 指针进行虚调用到 **Query_base** 版本的 **rep**
-* 因为 **andq** 指向 **AndQuery** 对象，该调用将运行 **AndQuery::rep**
+    ```cpp
+    Query andq = Query(sought1) & Query(sought2);
+    cout << andq << endl;
+    ```
+* 输出运算符在`andq`上调用 `Query::rep`
+* `Query::rep`通过其 `Query_base`指针进行虚调用到 `Query_base`版本的`rep`
+* 因为`andq`指向`AndQuery`对象，该调用将运行 `AndQuery::rep`
 
 **注意点**
-* 💡 **虚调用链**：operator<< → Query::rep → Query_base::rep（虚调用）→ AndQuery::rep（动态绑定）
-* 🔄 **多态性体现**：同样的代码可以根据实际对象类型调用不同的rep实现
+* 💡 **虚调用链**：`operator<<` → `Query::rep` → `Query_base::rep`（虚调用）→ `AndQuery::rep`（动态绑定）
+* 🔄 **多态性体现**：同样的代码可以根据实际对象类型调用不同的`rep`实现
 
 ---
-
 <a id="id13"></a>
 ## ✅ 知识点13: 派生类概述
 
 **理论**
-* 从 **Query_base** 派生的类最有趣的部分是它们如何被表示
-* **WordQuery** 类最简单直接，其工作是保存搜索词(search word)
+* 从`Query_base`派生的类最有趣的部分是它们如何被表示
+* `WordQuery`类最简单直接，其工作是保存搜索词
 * 其他类操作一个或两个操作数：
-  * **NotQuery** 有一个操作数(operand)
-  * **AndQuery** 和 **OrQuery** 有两个操作数
-* 在这些类的每一个中，操作数可以是任何从 **Query_base** 派生的具体类的对象：
-  * **NotQuery** 可以应用于 **WordQuery**、**AndQuery**、**OrQuery** 或另一个 **NotQuery**
-* 为了允许这种灵活性，操作数必须存储为 **Query_base** 指针。这样可以将指针绑定到我们需要的任何具体类
+  * `NotQuery`有一个操作数
+  * `AndQuery`和`OrQuery`有两个操作数
+* 在这些类的每一个中，操作数可以是任何从`Query_base`派生的具体类的对象：
+  * `NotQuery`可以应用于 `WordQuery`、`AndQuery`、`OrQuery`或另一个`NotQuery`
+* 为了允许这种灵活性，操作数必须存储为`Query_base`指针。这样可以将指针绑定到我们需要的任何具体类
 
-**使用 Query 对象简化**
-* 然而，不是存储 **Query_base** 指针，我们的类将使用 **Query** 对象
+**使用`Query`对象简化**
+* 然而，不是存储`Query_base`指针，我们的类将使用`Query`对象
 * 就像使用接口类简化了用户代码一样，我们可以通过使用相同的类来简化自己的类代码
 
 **注意点**
-* 💡 **设计一致性**：实现类内部也使用Query接口类，而不是直接使用Query_base指针，保持一致性并简化代码
-* 📋 **灵活性**：NotQuery可以嵌套，支持复杂查询表达式
+* 💡 **设计一致性**：实现类内部也使用`Query`接口类，而不是直接使用`Query_base`指针，保持一致性并简化代码
+* 📋 **灵活性**：`NotQuery`可以嵌套，支持复杂查询表达式
 
 ---
 
 <a id="id14"></a>
-## ✅ 知识点14: WordQuery 类
+## ✅ 知识点14: `WordQuery`类
 
 **理论**
-* **WordQuery** 查找给定的 **string**
-* 这是唯一实际在给定 **TextQuery** 对象上执行查询的操作
+* `WordQuery`查找给定的 `string`
+* 这是唯一实际在给定`TextQuery`对象上执行查询的操作
 
 **WordQuery 类定义**
 ```cpp
@@ -422,12 +419,12 @@ class WordQuery: public Query_base {
 };
 ```
 
-* 像 **Query_base** 一样，**WordQuery** 没有 **public** 成员
-* **WordQuery** 必须将 **Query** 设为友元以允许 **Query** 访问 **WordQuery** 构造函数
-* 每个具体查询类都必须定义继承的纯虚函数 **eval** 和 **rep**
-* 我们在 **WordQuery** 类体内定义了两个操作：
-  * **eval** 调用其给定 **TextQuery** 参数的 **query** 成员，该成员在文件中执行实际搜索
-  * **rep** 返回此 **WordQuery** 表示的 **string**（即 **query_word**）
+* 像`Query_base`一样，`WordQuery`没有`public`成员
+* `WordQuery`必须将`Query`设为友元以允许`Query`访问 `WordQuery`构造函数
+* 每个具体查询类都必须定义继承的纯虚函数`eval`和`rep`
+* 我们在`WordQuery`类体内定义了两个操作：
+  * `eval`调用其给定 `TextQuery`参数的`query`成员，该成员在文件中执行实际搜索
+  * `rep`返回此`WordQuery`表示的`string`（即 `query_word`）
 
 **注意点**
 * 📋 **具体类(Concrete Class)**：WordQuery是具体类，实现了所有纯虚函数，可以创建对象
