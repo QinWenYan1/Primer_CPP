@@ -30,25 +30,31 @@
 <summary><b>👉 点击展开</b></summary>
 
 #### 第一部分：基础
-- [第 1 章：开始](./Chapter01_get_started/README.md) — 编译运行、I/O、控制流、初识类
-- [第 2 章：变量和基本类型](./Chapter02_variable_type/README.md)
-- [第 3 章：字符串、向量和数组](./Chapter03_String_Vector_Array/README.md)
-- [第 4 章：表达式](./Chapter04_expression/README.md)
-- [第 5 章：语句](./Chapter05_statement/README.md)
-- [第 6 章：函数](./Chapter06_functions/README.md)
-- [第 7 章：类](./Chapter07_classes/README.md)
+| 章节 | 关键词 |
+|:-----|:-------|
+| [第 1 章：开始](./Chapter01_get_started/README.md) | `main()`, iostream, cin, cout, 编译运行 |
+| [第 2 章：变量和基本类型](./Chapter02_variable_type/README.md) | 变量, 类型, const, 引用, 指针 |
+| [第 3 章：字符串、向量和数组](./Chapter03_String_Vector_Array/README.md) | string, vector, 数组, 迭代器 |
+| [第 4 章：表达式](./Chapter04_expression/README.md) | 运算符, 类型转换, cast |
+| [第 5 章：语句](./Chapter05_statement/README.md) | if, switch, for, while, try-catch |
+| [第 6 章：函数](./Chapter06_functions/README.md) | 函数, 参数传递, 重载, Lambda |
+| [第 7 章：类](./Chapter07_classes/README.md) | class, 构造函数, 访问控制, this, 友元, static |
 
 #### 第二部分：标准库
-- [第 8 章：IO 库](./Chapter08_IO_library/README.md)
-- [第 9 章：顺序容器](./Chapter09_sequential_containers/README.md)
-- [第 10 章：泛型算法](./Chapter10_generic_algorithms/README.md)
-- [第 11 章：关联容器](./Chapter11_associative_containers/README.md)
-- [第 12 章：动态内存](./Chapter12_dynamic_memory/README.md)
+| 章节 | 关键词 |
+|:-----|:-------|
+| [第 8 章：IO 库](./Chapter08_IO_library/README.md) | fstream, 文件读写, stringstream |
+| [第 9 章：顺序容器](./Chapter09_sequential_containers/README.md) | vector, deque, list, stack, queue |
+| [第 10 章：泛型算法](./Chapter10_generic_algorithms/README.md) | sort, find, 函数对象, bind, Lambda |
+| [第 11 章：关联容器](./Chapter11_associative_containers/README.md) | map, set, unordered_map, 哈希表 |
+| [第 12 章：动态内存](./Chapter12_dynamic_memory/README.md) | new, delete, shared_ptr, unique_ptr |
 
 #### 第三部分：类和面向对象
-- [第 13 章：拷贝控制](./Chapter13_copy_control/README.md)
-- [第 14 章：重载运算与类型转换](./Chapter14_overloaded_operations_and_conversions/README.md)
-- [第 15 章：面向对象程序设计](./Chapter15_object_oriented_programming/README.md)
+| 章节 | 关键词 |
+|:-----|:-------|
+| [第 13 章：拷贝控制](./Chapter13_copy_control/README.md) | 拷贝构造, 移动语义, 右值引用, 三五法则 |
+| [第 14 章：重载运算与类型转换](./Chapter14_overloaded_operations_and_conversions/README.md) | 运算符重载, 类型转换运算符 |
+| [第 15 章：面向对象程序设计](./Chapter15_object_oriented_programming/README.md) | 继承, 虚函数, 多态, 抽象类, override, final |
 
 </details>
 
