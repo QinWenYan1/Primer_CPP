@@ -201,19 +201,21 @@ template <typename T, class U> calc (const T&, const U&);
 * **概念**：除了定义类型参数外，还可以定义接受**非类型参数(Nontype Parameters)** 的模板
 * **表示内容**：非类型参数代表一个值而非类型，通过使用特定类型名指定
 * **实参要求**：实例化时，非类型参数被用户提供的值或编译器推断的值替换，这些值必须是**常量表达式**
+* **重要区别**：非类型模板参数（NTTP） 给你的不是"运行时变量"，而是编译期常量，且这个值会成为类型的一部分。
 * **可用类型**：可以是整型、指向对象或函数的指针或(lvalue)引用
+* **用途**：如下面例子，非类型模板参数让你把数字（如数组大小、循环次数）直接"写死"在类型里，编译器会针对这个具体数字生成最优代码，省去运行时的内存分配和计算开销。
+
 
 **教材示例代码**
 ```cpp
-// 比较字符串字面量的版本
-template<unsigned N, unsigned M>
-int compare(const char (&p1)[N], const char (&p2)[M])
-{
-    return strcmp(p1, p2);
+template<typename T, size_t N>
+void print_array(const T (&arr)[N]) {  // N自动推导为数组长度
+    for(size_t i = 0; i < N; ++i) 
+        cout << arr[i];
 }
 
-// 调用
-compare("hi", "mom")  // 实例化为 compare(const char (&)[3], const char (&)[4])
+int a[5] = {1,2,3,4,5};
+print_array(a);  // 自动实例化为 print_array<int, 5>，不会越界
 ```
 
 **注意点**
@@ -224,7 +226,7 @@ compare("hi", "mom")  // 实例化为 compare(const char (&)[3], const char (&)[
 ---
 
 <a id="id8"></a>
-## ✅ 知识点8: inline和constexpr函数模板
+## ✅ 知识点8: `inline`和`constexpr`函数模板
 
 **理论**
 * **声明方式**：函数模板可以像非模板函数一样声明为 `inline` 或 `constexpr`
@@ -288,7 +290,7 @@ cout << compare(data1, data2) << endl;  // error: no < on Sales_data
 ```
 
 **注意点**
-* ⚠️ **头文件要求**：函数模板和类模板成员函数的定义通常放在头文件中
+* ⚠️ **头文件要求**：**函数模板**和**类模板成员函数**的定义通常放在头文件中
 * ⚠️ **调用者责任**：必须保证传递给模板的实参支持模板使用的任何操作，且操作行为正确
 
 ---
