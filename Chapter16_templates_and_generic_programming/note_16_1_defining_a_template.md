@@ -522,6 +522,7 @@ template <typename> class Blob;  // needed for parameters in operator==
 template <typename T>
     bool operator==(const Blob<T>&, const Blob<T>&);
 
+// 一对一友元
 template <typename T> class Blob {
     // each instantiation of Blob grants access to the version of
     // BlobPtr and the equality operator instantiated with the same type
@@ -530,10 +531,17 @@ template <typename T> class Blob {
         (const Blob<T>&, const Blob<T>&);
     // ...
 };
+
+//所有实力通用化， 一对多友元
+template <typename T> class Blob {
+    // 关键：使用与类模板不同的模板参数（如 X）
+    template <typename X> friend class BlobPtr;  // 所有人都是朋友！
+};
 ```
 
 **注意点**
-* 📋 **前置声明**：友元声明前需要前置声明模板本身
+* 📋 **前置声明**：友元声明前需要前置声明模板本身，并且可以省略 `T`占位符
+    * 因为编译器需要提前知道 BlobPtr 是个"类模板"，而不是普通类，才能理解你写的 <T> 是什么意思
 * 🔧 **参数匹配**：友元声明使用 `Blob` 的模板参数作为自身的模板实参，限制为相同类型的实例化
 * 💡 **C++11特性**：可以将模板类型参数设为友元：`friend Type;`（将实例化类型设为友元）
 
@@ -543,7 +551,7 @@ template <typename T> class Blob {
 ## ✅ 知识点20: 模板类型别名(Template Type Aliases)
 
 **理论**
-* **typedef限制**：由于模板不是类型，不能定义引用模板的 `typedef`（如不能定义引用 `Blob<T>` 的 `typedef`）
+* **`typedef`限制**：由于模板不是类型，不能定义引用模板的 `typedef`（如不能定义引用 `Blob<T>` 的 `typedef`）
 * **C++11类型别名**：新标准允许为类模板定义**类型别名(Type Alias)**，使用 `using`
 * **类家族同义词**：模板类型别名是一族类的同义词
 
