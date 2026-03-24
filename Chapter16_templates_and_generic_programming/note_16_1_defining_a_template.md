@@ -81,6 +81,7 @@ int compare(const double &v1, const double &v2)
 ## ✅ 知识点2: 函数模板的定义
 
 **理论**
+* **OOP vs 泛型编程**：OOP的类型在**运行时**通过虚机制动态绑定，而泛型编程（模板）的类型在**编译时**实例化确定，生成具体类型代码。
 * **核心概念**：函数模板(Function Template)是一个公式，可以从中生成特定类型的函数版本
 * **定义方式**：使用关键字 `template` 开始，后跟**模板参数列表(Template Parameter List)**
 
@@ -94,10 +95,10 @@ int compare(const T &v1, const T &v2)
     return 0;
 }
 ```
-
 **注意点**
 * 📋 **关键字**：`template` 和 `typename` 是模板定义的核心关键字
 * 🔧 **类型参数**：`T` 是**类型参数(Type Parameter)**，在函数体内用作类型名
+
 
 ---
 
@@ -125,7 +126,7 @@ template <typename T, class U>
 ## ✅ 知识点4: 函数模板的实例化(Instantiating)
 
 **理论**
-* **实例化过程**：调用函数模板时，编译器(通常)使用调用实参来推断**模板实参(Template Arguments)**
+* **实例化过程**：调用函数模板时，编译器(通常)使用**函数的调用实参**来推断**模板实参(Template Arguments)**
 * **类型绑定**：编译器使用推断出的模板参数来**实例化(Instantiate)** 函数的特定版本
 * **实例(Instance)**：编译器创建模板的一个新"实例"，用实际的模板实参替换对应的模板形参
 
@@ -171,7 +172,7 @@ T foo(T* p)
 ---
 
 <a id="id6"></a>
-## ✅ 知识点6: typename与class关键字
+## ✅ 知识点6: `typename`与`class`关键字
 
 **理论**
 * **关键字选择**：每个类型参数前必须加关键字 `class` 或 `typename`
@@ -189,7 +190,7 @@ template <typename T, class U> calc (const T&, const U&);
 
 **注意点**
 * ⚠️ **错误示例**：`U` 前缺少 `typename` 或 `class` 会导致编译错误
-* 📋 **最佳实践**：`typename` 更清晰地表明后面跟着的是类型名，推荐使用
+* 📋 **最佳实践**：`typename` 更清晰地表明后面跟着的是类型名，**推荐使用**
 
 ---
 
