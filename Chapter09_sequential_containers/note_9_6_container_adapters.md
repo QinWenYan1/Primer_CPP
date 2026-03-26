@@ -185,8 +185,26 @@ while (!intStack.empty()) {  // 栈中仍有值时
 * `queue`使用**先进先出**（FIFO）策略
 * `priority_queue`允许建立元素优先级，新元素根据优先级插入
   * 例子：餐厅排队，但是每个人都有预定时间，根据预定时间入座
-* 默认使用`<`运算符确定相对优先级
+* 默认使用`<`运算符确定相对优先级, 也就是`less<>`
+  * 其中运算符 `comp(a, b) = true` 表示`a`的优先级比`b`低（`b` 会在堆顶）
 
+**示例代码**
+```cpp
+// 默认：最大堆，最大的元素在队首
+priority_queue<int> pq;  
+// 完整写法等价于：
+priority_queue<int, vector<int>, less<int>> pq;
+
+struct Node {
+    int x, y;
+};
+
+// 使用lambda初始化，注意要用decltype推导类型
+auto cmp = [](const Node& a, const Node& b) {
+    return a.x > b.x;  // x小的优先级高（小顶堆）
+};
+priority_queue<Node, vector<Node>, decltype(cmp)> pq(cmp);
+```
 **注意点**
 * ⚠️ `queue`示例：按到达顺序入座的餐厅
 * ⚠️ `priority_queue`示例：按预约时间入座的餐厅
