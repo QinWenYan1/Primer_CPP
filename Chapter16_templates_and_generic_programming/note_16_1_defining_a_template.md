@@ -752,7 +752,8 @@ Numbers<> average_precision;  // empty <> says we want the default type
 
 **理论**
 * **定义**：类（普通类或类模板）可以有本身是模板的成员函数，这样的成员称为**成员模板(Member Templates)**
-* **限制**：成员模板**不能是虚函数(virtual)**
+* **限制**：成员模板**不能是虚函数(`virtual`)**
+     * **核心原因**在于：虚函数表（vtable）的大小必须在编译时固定，而成员模板在编译时可能实例化出无限多个版本，编译器无法预知需要预留多少表项。
 * **独立性**：类模板和成员模板有各自独立的模板参数
 
 **注意点**
@@ -820,7 +821,7 @@ Blob<T>::Blob(It b, It e):
 ```
 
 **注意点**
-* 📋 **参数列表顺序**：先写类的模板参数列表，后写成员自己的模板参数列表
+* 📋 **参数列表顺序**：先写**类的模板**参数列表，后写成员**自己的模板**参数列表
 * 💡 **应用场景**：`Blob`的迭代器范围构造函数，支持从不同序列类型构造
 
 ---
@@ -854,7 +855,11 @@ Blob<string> a3(w.begin(), w.end());        // It 推断为 list<const char*>::i
 
 **理论**
 * **实例化开销**：模板在使用时生成实例化，相同模板可能在多个文件中实例化，在大系统中开销显著
-* **显式实例化**：通过**显式实例化(Explicit Instantiation)** 避免开销，形式为 `extern template declaration`（声明）或 `template declaration`（定义）
+* **显式实例化**：通过**显式实例化(Explicit Instantiation)** 避免开销，形式为：
+    1. `extern template declaration`（声明）
+    2.  `template declaration`（定义）
+* 其中声明是指**所有模板形参均被模板实参替换后**的类或函数声明。
+* 在特定编译单元中显式指定模板实例后，就可以避免多个文件重复实例化同一个模板。
 
 **教材示例代码**
 ```cpp
@@ -869,7 +874,7 @@ template class Blob<string>;
 
 **注意点**
 * ⚠️ **位置要求**：`extern` 声明必须出现在使用实例化的代码之前
-* 📋 **链接要求**：`Application.o` 必须链接包含实例化定义的 `templateBuild.o`
+
 
 ---
 
@@ -878,8 +883,8 @@ template class Blob<string>;
 
 **理论**
 * **声明与定义**：
-  - `extern template`：实例化声明，承诺在其他地方有非 `extern` 定义
-  - `template`：实例化定义，生成代码
+  - `extern template declaration`：实例化声明，承诺在其他地方有非 `extern` 定义
+  - `template declaration`：实例化定义，生成代码
 * **使用限制**：可以有多个 `extern` 声明，但必须有且只有一个定义
 
 **教材示例代码**
@@ -889,18 +894,25 @@ extern template class Blob<string>;  // 实例化将出现在别处
 extern template int compare(const int&, const int&);
 Blob<string> sa1, sa2;  // 使用extern声明的实例化
 int i = compare(a1[0], a2[0]);  // 实例化将出现在别处
+Blob<int> a1 = {0,1,2,3,4,5,6,7,8,9};
 
 // templateBuild.cc（必须链接到Application）
 template int compare(const int&, const int&);
 template class Blob<string>;  // 实例化所有成员
 ```
 
+**代码解析**
+* `compare<int>`, `Blob<string>` 不会在`Application.cc`给实例化。
+* 因为编译器知道他们的模版一定在其他文件里存在。 
+* 当在`templateBuild.cc`里面编译器看到了实例化的定义然后再生成代码
+* 因此 **链接要求**：`Application.o` 必须链接包含实例化定义的 `templateBuild.o`
+
 **注意点**
 * ⚠️ **单一定义规则**：每个显式实例化声明必须在程序某处有显式实例化定义
 * 📋 **代码生成**：编译器看到实例化定义时生成代码，看到 `extern` 声明时不生成
 
----
 
+---
 <a id="id33"></a>
 ## ✅ 知识点33: 实例化定义实例化所有成员
 
