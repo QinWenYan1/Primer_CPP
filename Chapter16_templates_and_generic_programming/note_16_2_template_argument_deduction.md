@@ -652,6 +652,8 @@ intermediary(Type &&arg) {
 * 📋 **术语提醒**：完美转发(perfect forwarding)指保留所有类型信息（包括`const`性和值类别）的转发。
 * ⚠️ **使用规范**：与`std::move`一样，最好不要为`std::forward`提供using声明。
 * 💡 **关键区别**：`std::move`总是将对象转换为右值，而`std::forward`根据原始实参的值类别进行条件转换。
+* 🙋 **为什么使用使用`std::forward`而不是`std::static_cast`来转发信息?**
+  **转发选择**：`std::forward` 本质是 `static_cast<T&&>`，但强制要求模板参数 `T` 并明确表达"完美转发"意图，防止手动转换时误将左值当右值"偷走"资源，兼顾安全性与可读性。
 
 ---
 
