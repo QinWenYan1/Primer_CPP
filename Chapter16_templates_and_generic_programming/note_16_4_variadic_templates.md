@@ -491,8 +491,8 @@ print(ostream&, const int&, const string&, const int&);
 
 **理论**
 * **第二次展开位置**：发生在（递归）对`print`的调用中。
-* **模式**：模式是**函数参数包的名称(name of the function parameter pack)**，即`rest`。
-* **展开结果**：此模式展开为包中元素的**逗号分隔列表(comma-separated list)**。
+* **模式**：模式是**函数参数包的名称**，即`rest`。
+* **展开结果**：此模式展开为包中元素的**逗号分隔列表**。
 * **等效性**：因此，调用`print(os, rest...)`等效于`print(os, s, 42)`（假设`rest`包含`s`和`42`）。
 
 **教材示例代码**
@@ -503,22 +503,17 @@ print(os, rest...); // 如果rest包含s, 42
 print(os, s, 42);
 ```
 
-**注意点**
-* 💡 **简洁展开**：当模式就是参数包本身时，直接展开为元素列表
-* 🔄 **递归驱动**：这种展开是递归能够"消耗"参数的关键
-
 ---
 
 <a id="id26"></a>
 ## ✅ 知识点26: 理解参数包展开(Understanding Pack Expansions)
 
 **理论**
-* **展开本质**：`print`中的函数参数包展开只是将包展开为其**组成部分(constituent parts)**。
-* **复杂模式**：当我们展开函数参数包时，也可以使用**更复杂的模式(more complicated patterns)**。
-* **示例场景**：可以编写第二个可变参数函数，对每个实参调用`debug_rep`（§ 16.3, p. 695），然后调用`print`打印结果字符串。
+* **展开本质**：`print`中的函数参数包展开只是将包展开为其**组成部分**。
+* **复杂模式**：当我们展开函数参数包时，也可以使用**更复杂的模式**。
+* **示例场景**：可以编写第二个可变参数函数，对每个实参调用`debug_rep`（§ 16.3），然后调用`print`打印结果字符串。
 
 **注意点**
-* 📋 **术语对照**：constituent parts（组成部分）、complicated patterns（复杂模式）
 * 💡 **进阶应用**：复杂模式允许在展开过程中对每个元素进行转换或包装
 
 ---
@@ -574,7 +569,7 @@ print(cerr, debug_rep(fcnName), debug_rep(code.num()),
 
 **注意点**
 * 💡 **元素级转换**：每个参数都经过`debug_rep`处理后再传递给`print`
-* ⚠️ **类型要求**：`debug_rep`必须能够接受包中每种类型的参数
+* ⚠️ **类型要求**：`debug_rep`必须能够**接受包中每种类型的参数**
 
 ---
 
@@ -587,11 +582,11 @@ print(cerr, debug_rep(fcnName), debug_rep(code.num()),
   // passes the pack to debug_rep; print(os, debug_rep(a1, a2, ..., an))
   print(os, debug_rep(rest...)); // error: no matching function to call
   ```
-* **错误原因**：问题在于我们在对`debug_rep`的调用中展开了`rest`。此调用将执行如同我们写了：
+* **错误原因**：问题在于我们在对`debug_rep`的调用中**展开了`rest`**。此调用将执行如同我们写了：
   ```cpp
   print(cerr, debug_rep(fcnName, code.num(), otherData, "otherData", item));
   ```
-* **类型不匹配**：在此展开中，我们试图用**五个实参的列表(a list of five arguments)**调用`debug_rep`。但`debug_rep`不是可变参数的，没有接受五个参数的版本。
+* **类型不匹配**：在此展开中，我们试图用**五个实参的列表**调用`debug_rep`。但`debug_rep`不是可变参数的，没有接受五个参数的版本。
 
 **教材示例代码**
 ```cpp
@@ -613,12 +608,12 @@ print(cerr, debug_rep(fcnName, code.num(),
 ## ✅ 知识点30: 展开模式的应用范围(Note)
 
 **理论**
-* **重要说明**：展开中的模式**分别应用于(separately to)**包中的每个元素。
+* **重要说明**：展开中的模式**分别应用于**包中的每个元素。
 * **含义**：这意味着模式中的操作（如函数调用、类型修饰等）会独立应用于每个元素，而不是应用于整个包。
 
 **注意点**
 * 📋 **核心概念**：记住"分别应用"这一关键特性
-* 💡 **理解技巧**：可以将包看作列表，模式是map操作，分别作用于每个元素
+
 
 ---
 
@@ -626,12 +621,11 @@ print(cerr, debug_rep(fcnName, code.num(),
 ## ✅ 知识点31: 转发参数包(Forwarding Parameter Packs)
 
 **理论**
-* **本节主题**：16.4.3节介绍**转发参数包(Forwarding Parameter Packs)**。
-* **新标准特性**：在新标准下，我们可以将可变参数模板与**forward**一起使用，编写将其实参**原封不动地(unchanged)**传递给其他函数的函数。
-* **示例场景**：为`StrVec`类（§ 13.5, p. 526）添加`emplace_back`成员。标准库的`emplace_back`成员是一个可变参数成员模板（§ 16.1.4, p. 673），使用其实参在容器管理的内存中**直接构造(construct directly)**元素。
+* **本节主题**：16.4.3节介绍**转发参数包**。
+* **新标准特性**：在新标准下，我们可以将可变参数模板与**forward**一起使用，编写将其实参**原封不动地**传递给其他函数的函数。
+* **示例场景**：为`StrVec`类（§ 13.5）添加`emplace_back`成员。标准库的`emplace_back`成员是一个可变参数成员模板（§ 16.1.4），使用其实参在容器管理的内存中**直接构造**元素。
 
 **注意点**
-* 📋 **术语对照**：forwarding（转发）、emplace_back（原位构造）、construct directly（直接构造）
 * 🔄 **知识关联**：参考§ 16.1.4关于可变参数成员模板的内容
 
 ---
@@ -640,11 +634,11 @@ print(cerr, debug_rep(fcnName, code.num(),
 ## ✅ 知识点32: emplace_back与可变参数模板
 
 **理论**
-* **可变参数必要性**：我们为`StrVec`实现的`emplace_back`也必须是**可变的(variadic)**，因为`string`有多个构造函数，它们的参数各不相同。
-* **类型信息保持**：为了能够使用`string`的移动构造函数，我们还需要**保留(preserve)**传递给`emplace_back`的实参的所有类型信息。
+* **可变参数必要性**：我们为`StrVec`实现的`emplace_back`也必须是**可变的**，因为`string`有多个构造函数，它们的参数各不相同。
+* **类型信息保持**：为了能够使用`string`的移动构造函数，我们还需要**保留**传递给`emplace_back`的实参的所有类型信息。
 * **两步保持过程**：
-  1. 为了保留实参中的类型信息，必须将`emplace_back`的函数参数定义为**右值引用(rvalue references)**到模板类型参数（§ 16.2.7, p. 693）
-  2. 必须使用**forward**来在`emplace_back`将这些实参传递给`construct`时保留实参的原始类型（§ 16.2.7, p. 694）
+  1. 为了保留实参中的类型信息，必须将`emplace_back`的函数参数定义为**右值引用**到模板类型参数（§ 16.2.7）
+  2. 必须使用`forward`来在`emplace_back`将这些实参传递给`construct`时保留实参的原始类型（§ 16.2.7）
 
 **注意点**
 * 🔄 **知识关联**：涉及§ 16.2.7的完美转发和引用折叠
@@ -658,7 +652,7 @@ print(cerr, debug_rep(fcnName, code.num(),
 **理论**
 * **类定义**：在`StrVec`类中声明`emplace_back`为可变参数模板成员函数。
 * **参数类型**：`Args&&...`表示每个函数参数都是对应实参的右值引用。
-* **代码结构**：类中包含`emplace_back`的模板声明，以及其他成员（如§ 13.5, p. 526所述）。
+* **代码结构**：类中包含`emplace_back`的模板声明，以及其他成员（如§ 13.5）。
 
 **教材示例代码**
 ```cpp
@@ -670,7 +664,7 @@ public:
 ```
 
 **注意点**
-* 📋 **语法注意**：`Args&&...`中`&&`应用于`Args`中的每个类型，这是**转发引用(forwarding reference)**
+* 📋 **语法注意**：`Args&&...`中`&&`应用于`Args`中的每个类型，这是**转发引用**
 * ⚠️ **与右值引用的区别**：虽然看起来像右值引用，但由于`Args`是模板参数，这实际上是转发引用，可以绑定到左值或右值
 
 ---
@@ -679,8 +673,8 @@ public:
 ## ✅ 知识点34: 右值引用模式(&&)
 
 **理论**
-* **模式含义**：模板参数包展开中的`&&`模式意味着每个函数参数将是其对应实参的**右值引用(rvalue reference)**。
-* **引用折叠**：由于模板参数推导和引用折叠规则（§ 16.2.7），`Args&&...`可以接受左值或右值，并保留其值类别。
+* **模式含义**：模板参数包展开中的`&&`模式意味着每个函数参数将是其对应实参的**右值引用**。
+* **引用折叠**：由于模板参数推导和引用折叠规则（§16.2.7），`Args&&...`可以接受左值或右值，并保留其值类别。
 
 **注意点**
 * 🔄 **知识关联**：必须结合§ 16.2.7的引用折叠规则理解
@@ -734,8 +728,8 @@ void StrVec::emplace_back(Args&&... args)
 
 **理论**
 * **类型表示**：`std::forward<Ti>(ti)`中：
-  * `Ti`代表模板参数包中**第i个元素(the ith element)**的类型
-  * `ti`代表函数参数包中**第i个元素(the ith element)**
+  * `Ti`代表模板参数包中**第i个元素**的类型
+  * `ti`代表函数参数包中**第i个元素**
 * **示例**：假设`svec`是`StrVec`，调用`svec.emplace_back(10, 'c')`将添加`cccccccccc`作为新最后一个元素。
 
 **教材示例代码**
@@ -776,9 +770,9 @@ std::forward<int>(10), std::forward<char>(c)
 ## ✅ 知识点39: forward保证值类别
 
 **理论**
-* **保证机制**：通过在调用中使用`forward`，我们保证如果`emplace_back`被**右值(rvalue)**调用，则`construct`也会接收到**右值(rvalue)**。
+* **保证机制**：通过在调用中使用`forward`，我们保证如果`emplace_back`被**右值**调用，则`construct`也会接收到**右值**。
 * **移动构造示例**：在调用`svec.emplace_back(s1 + s2)`中，`s1 + s2`是右值，传递给`emplace_back`的实参是右值，进而作为右值引用传递给`construct`。
-* **结果**：`forward<string>`的结果类型是`string&&`，因此`construct`被调用时接收到右值引用，construct函数内部将此实参转发给`string`的**移动构造函数(move constructor)**来构建此元素。
+* **结果**：`forward<string>`的结果类型是`string&&`，因此`construct`被调用时接收到右值引用，construct函数内部将此实参转发给`string`的<b>移动构造函数</b>来构建此元素。
 
 **教材示例代码**
 ```cpp
@@ -790,7 +784,7 @@ std::forward<string>(string("the end"))
 
 **注意点**
 * ⚠️ **效率关键**：完美转发使得可以直接使用移动语义，避免不必要的拷贝
-* 🔄 **知识关联**：回顾§ 13.6的移动构造函数概念
+
 
 ---
 
@@ -810,7 +804,7 @@ std::forward<string>(string("the end"))
       work(std::forward<Args>(args)...);
   }
   ```
-* **目的**：这里我们希望将`fun`的所有实参转发给另一个名为`work`的函数，work presumably does the real work of the function。
+* **目的**：这里我们希望将`fun`的所有实参转发给另一个名为`work`的函数。
 
 **教材示例代码**
 ```cpp
