@@ -53,12 +53,11 @@
 ## ✅ 知识点1: Variadic Template的定义
 
 **理论**
-* **核心概念**：**可变参数模板(variadic template)** 是指可以接受**可变数量(varying number)**参数的模板函数或类。
+* **核心概念**：<b>可变参数模板(variadic template)</b>是指可以接受<b>可变数量(varying number)</b>参数的模板函数或类。
 * **参数包概念**：这些可变的参数被称为**参数包(parameter pack)**。
-* **基本定义**：A variadic template is a template function or class that can take a varying number of parameters. The varying parameters are known as a parameter pack.
+
 
 **注意点**
-* 📋 **术语对照**：variadic template（可变参数模板）、parameter pack（参数包）
 * 💡 **应用场景**：当需要处理数量不定的参数时使用，区别于固定参数模板
 
 ---
@@ -70,10 +69,9 @@
 * **分类**：参数包分为两种类型：
   1. **模板参数包(template parameter pack)**：代表零个或多个**模板参数(template parameters)**
   2. **函数参数包(function parameter pack)**：代表零个或多个**函数参数(function parameters)**
-* **原文描述**：There are two kinds of parameter packs: A template parameter pack represents zero or more template parameters, and a function parameter pack represents zero or more function parameters.
+
 
 **注意点**
-* 📋 **术语对照**：template parameter pack（模板参数包）、function parameter pack（函数参数包）
 * ⚠️ **关键区别**：前者关乎类型参数，后者关乎函数实参
 
 ---
@@ -84,10 +82,9 @@
 **理论**
 * **符号表示**：使用**省略号(ellipsis)** `...` 来表示一个模板或函数参数代表一个包(parameter pack)。
 * **模板参数列表中的用法**：
-  * `class...` 或 `typename...` 表示接下来的参数代表**零个或多个类型的列表(a list of zero or more types)**
-  * 类型名后跟省略号表示**零个或多个给定类型的非类型参数(a list of zero or more nontype parameters of the given type)**
+  * `class...` 或 `typename...` 表示接下来的参数代表**零个或多个类型的列表**
+  * 类型名后跟省略号表示**零个或多个给定类型的非类型参数**
 * **函数参数列表中的用法**：如果参数的类型是模板参数包，则该参数是一个**函数参数包(function parameter pack)**。
-* **原文描述**：We use an ellipsis to indicate that a template or function parameter represents a pack. In a template parameter list, `class...` or `typename...` indicates that the following parameter represents a list of zero or more types; the name of a type followed by an ellipsis represents a list of zero or more nontype parameters of the given type. In the function parameter list, a parameter whose type is a template parameter pack is a function parameter pack.
 
 **注意点**
 * 📋 **语法关键**：`...`的位置决定了它修饰的是类型包还是参数包
@@ -101,10 +98,10 @@
 **理论**
 * **代码功能**：声明`foo`是一个可变参数函数，拥有一个名为`T`的类型参数和一个名为`Args`的模板参数包。
 * **参数解析**：
-  * `Args`包代表**零个或多个额外的类型参数(zero or more additional type parameters)**
+  * `Args`包代表**零个或多个额外的类型参数**
   * 函数参数列表包含两个部分：
     1. 第一个参数：类型为`const T&`，与类型`T`绑定
-    2. 第二个参数：**函数参数包(function parameter pack)** `rest`，类型为`const Args&...`，代表**零个或多个函数参数(zero or more function parameters)**
+    2. 第二个参数：**函数参数包** `rest`，类型为`const Args&...`，代表**零个或多个函数参数**
 
 **教材示例代码**
 ```cpp
@@ -116,7 +113,6 @@ void foo(const T &t, const Args& ... rest);
 ```
 
 **注意点**
-* 📋 **术语对照**：template parameter pack（模板参数包Args）、function parameter pack（函数参数包rest）
 * ⚠️ **重要细节**：`const Args& ... rest` 中，省略号位于`Args&`之后，表示rest是一个参数包，其中每个参数都是`const`引用类型
 
 ---
@@ -126,8 +122,8 @@ void foo(const T &t, const Args& ... rest);
 
 **理论**
 * **常规推导**：像往常一样，编译器从函数的实参中推导模板参数类型。
-* **可变参数特殊推导**：对于可变参数模板，编译器还会**推导包中参数的数量(deduces the number of parameters in the pack)**。
-* **原文描述**：As usual, the compiler deduces the template parameter types from the function's arguments. For a variadic template, the compiler also deduces the number of parameters in the pack.
+* **可变参数特殊推导**：对于可变参数模板，编译器还会**推导包中参数的数量**。
+
 
 **注意点**
 * 🔄 **知识关联**：与普通模板推导机制一致，但额外增加了数量推导
@@ -141,10 +137,10 @@ void foo(const T &t, const Args& ... rest);
 **理论**
 * **调用示例**：给定以下调用，编译器将实例化`foo`的四个不同实例。
 * **具体调用**：
-  1. `foo(i, s, 42, d);` —— **pack中有三个参数(three parameters in the pack)**
-  2. `foo(s, 42, "hi");` —— **pack中有两个参数(two parameters in the pack)**
-  3. `foo(d, s);` —— **pack中有一个参数(one parameter in the pack)**
-  4. `foo("hi");` —— **空包(empty pack)**
+  1. `foo(i, s, 42, d);` —— **pack中有三个参数**
+  2. `foo(s, 42, "hi");` —— **pack中有两个参数**
+  3. `foo(d, s);` —— **pack中有一个参数**
+  4. `foo("hi");` —— **空包**
 
 **教材示例代码**
 ```cpp
@@ -166,7 +162,7 @@ foo("hi");           // empty pack
 
 **理论**
 * **实例化结果**：对于上述四个调用，编译器将实例化四个不同的`foo`版本。
-* **类型推导规则**：在每种情况下，`T`的类型从**第一个实参(the first argument)**的类型推导得出。
+* **类型推导规则**：在每种情况下，`T`的类型从**第一个实参**的类型推导得出。
 * **剩余参数处理**：剩余的参数（如果有的话）提供包中额外参数的数量和类型。
 
 **教材示例代码**
@@ -178,7 +174,6 @@ void foo(const char[3]&);
 ```
 
 **注意点**
-* ⚠️ **类型保持**：注意`const`限定符和引用在推导中的保持
 * 🔧 **数组退化**：字符串字面量`"hi"`被推导为`const char[3]`（包含空终止符）
 
 ---
@@ -188,7 +183,7 @@ void foo(const char[3]&);
 
 **理论**
 * **功能**：当我们需要知道一个包中有多少元素时，可以使用**sizeof...操作符(sizeof... operator)**。
-* **特性**：与`sizeof`类似（§ 4.9, p. 156），`sizeof...`返回**常量表达式(constant expression)**（§ 2.4.4, p. 65），并且**不会计算其实参的值(does not evaluate its argument)**。
+* **特性**：与`sizeof`类似（§ 4.9），`sizeof...`返回**常量表达式**（§ 2.4.4），并且**不会计算其实参的值**。
 * **用法**：可以应用于模板参数包或函数参数包。
 
 **教材示例代码**
@@ -200,7 +195,6 @@ template<typename ... Args> void g(Args ... args) {
 ```
 
 **注意点**
-* 📋 **术语对照**：sizeof... operator（sizeof...操作符）、constant expression（常量表达式）
 * 💡 **语法区别**：注意`sizeof...(Args)`（带括号）与`sizeof`的用法区别
 * ⚠️ **关键特性**：不计算实参值，仅在编译期返回数量
 
@@ -211,13 +205,10 @@ template<typename ... Args> void g(Args ... args) {
 
 **理论**
 * **本节主题**：16.4.1节介绍如何编写**可变参数函数模板(variadic function template)**。
-* **与initializer_list的对比**：在§ 6.2.6（p. 220）中，我们看到可以使用`initializer_list`来定义接受可变数量参数的函数，但那些参数必须具有**相同类型**(或可转换为共同类型)。
-* **可变参数函数的应用场景**：当我们既不知道要处理的参数**数量(number)**也不知道其**类型(types)**时使用可变参数函数。
+* **与initializer_list的对比**：在§ 6.2.6中，我们看到可以使用`initializer_list`来定义接受可变数量参数的函数，但那些参数必须具有**相同类型**(或可转换为共同类型)。
+* **可变参数函数的应用场景**：当我们既不知道要处理的参数**数量**也不知道其**类型**时使用可变参数函数。
 * **示例目标**：定义一个类似之前`error_msg`函数的可变参数函数，名为`print`，用于在给定流上打印给定参数列表的内容。
 
-**注意点**
-* 🔄 **知识关联**：与§ 6.2.6的`initializer_list`方法对比学习
-* 💡 **关键区别**：`initializer_list`要求同类型，可变参数模板允许不同类型和数量
 
 ---
 
@@ -225,9 +216,9 @@ template<typename ... Args> void g(Args ... args) {
 ## ✅ 知识点10: initializer_list与可变参数模板的对比
 
 **理论**
-* **initializer_list的限制**：使用`initializer_list`定义的函数，其参数必须具有**相同类型(same type)**，或者类型可转换为共同类型。
-* **可变参数模板的优势**：可变参数函数用于处理**数量(number)**和**类型(types)**都未知的参数。
-* **print函数定义**：本节将定义一个名为`print`的可变参数函数，它将打印给定参数列表的内容到给定流。
+* **`initializer_list`的限制**：使用`initializer_list`定义的函数，其参数必须具有**相同类型**，或者类型可转换为共同类型。
+* **可变参数模板的优势**：可变参数函数用于处理**数量**和**类型**都未知的参数。
+* **`print`函数定义**：本节将定义一个名为`print`的可变参数函数，它将打印给定参数列表的内容到给定流。
 
 **注意点**
 * ⚠️ **重要限制**：`initializer_list`不能处理不同类型参数，可变参数模板可以
@@ -239,14 +230,13 @@ template<typename ... Args> void g(Args ... args) {
 ## ✅ 知识点11: 递归处理参数包
 
 **理论**
-* **递归特性**：可变参数函数通常是**递归的(recursive)**（§ 6.3.2, p. 227）。
+* **递归特性**：可变参数函数通常是**递归的**（§ 6.3.2）。
 * **处理机制**：
-  1. **第一次调用**：处理包中的**第一个实参(first argument)**，并在剩余实参上调用自身
+  1. **第一次调用**：处理包中的**第一个实参**，并在剩余实参上调用自身
   2. **每次调用**：打印流上的第二个实参（即当前处理的参数）
-* **终止条件**：为了停止递归，我们需要定义一个**非可变参数(nonvariadic)**的`print`函数，它接受一个流和一个对象。
+* **终止条件**：为了停止递归，我们需要定义一个**非可变参数**的`print`函数，它接受一个流和一个对象。
 
 **注意点**
-* 🔄 **知识关联**：参考§ 6.3.2的递归概念
 * 💡 **核心机制**：通过递归每次处理一个参数，直到包为空
 * ⚠️ **必须有终止函数**：非可变参数版本是必须的，否则递归无限进行
 
@@ -281,7 +271,7 @@ ostream &print(ostream &os, const T &t)
 ## ✅ 知识点13: 可变参数版本的print函数
 
 **理论**
-* **功能**：此版本的`print`将被调用用于包中**除最后一个元素外的所有元素(all but the last element)**。
+* **功能**：此版本的`print`将被调用用于包中**除最后一个元素外的所有元素**。
 * **参数结构**：
   1. 第一个参数：`ostream& os`
   2. 第二个参数：`const T &t`（当前处理的元素）
