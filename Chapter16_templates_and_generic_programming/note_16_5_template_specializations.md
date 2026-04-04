@@ -40,25 +40,22 @@
 * **两种不适应情况**：
   1. **通用定义错误**：通用模板定义对某些类型可能是错误的——可能无法编译或可能做错事。
   2. **效率优化**：有时可以利用某些特定知识来编写比从模板实例化的代码更高效的代码。
-* **解决方案**：当不能（或不想）使用模板版本时，我们可以定义类或函数模板的**特化版本(specialized version)**。
-* **原文描述**：It is not always possible to write a single template that is best suited for every possible template argument with which the template might be instantiated. In some cases, the general template definition is simply wrong for a type... At other times, we may be able to take advantage of some specific knowledge to write more efficient code...
+* **解决方案**：当不能（或不想）使用模板版本时，我们可以定义类或函数模板的**特化版本**。
 
 **注意点**
-* 📋 **术语对照**：specialized version（特化版本）、general template definition（通用模板定义）
 * 💡 **核心思想**：特化允许为特定类型提供定制实现，覆盖通用模板的行为
-
 ---
 
 <a id="id2"></a>
 ## ✅ 知识点2: compare函数与字符指针问题
 
 **理论**
-* **示例场景**：`compare`函数是函数模板的一个好例子，其通用定义对特定类型（即**字符指针character pointers**）不适用。
+* **示例场景**：`compare`函数是函数模板的一个好例子，其通用定义对特定类型（即**字符指针**）不适用。
 * **期望行为**：希望`compare`通过调用`strcmp`来比较字符指针，而不是比较指针值（地址）。
-* **已有方案**：已经重载了`compare`函数来处理字符串字面量（§ 16.1.1, p. 654）。
+* **已有方案**：已经重载了`compare`函数来处理字符串字面量（§16.1.1）。
 * **两个版本**：
   1. 第一版本：可以比较任何两个类型
-  2. 第二版本：处理字符串字面量（使用非类型模板参数N和M）
+  2. 第二版本：处理字符串字面量（使用非类型模板参数`N`和`M`）
 
 **教材示例代码**
 ```cpp
@@ -71,7 +68,7 @@ int compare(const char (&)[N], const char (&)[M]);
 
 **注意点**
 * ⚠️ **问题核心**：字符指针的比较语义应该是字符串内容比较，而非地址比较
-* 🔄 **知识关联**：回顾§ 16.1.1中关于非类型模板参数和数组引用的内容
+* 🔄 **知识关联**：回顾§16.1.1中关于非类型模板参数和数组引用的内容
 
 ---
 
@@ -79,8 +76,8 @@ int compare(const char (&)[N], const char (&)[M]);
 ## ✅ 知识点3: 字符指针调用时的模板选择
 
 **理论**
-* **限制条件**：带有两个非类型模板参数的`compare`版本只在传递**字符串字面量(string literal)**或**数组(array)**时被调用。
-* **问题场景**：如果用**字符指针(character pointers)**调用`compare`，将调用第一个模板版本（通用版本）。
+* **限制条件**：带有两个非类型模板参数的`compare`版本只在传递**字符串字面量**或**数组**时被调用。
+* **问题场景**：如果用**字符指针**调用`compare`，将调用第一个模板版本（通用版本）。
 * **原因**：指针无法转换为数组引用，所以第二个版本在传递指针实参时不可行。
 
 **教材示例代码**
@@ -95,17 +92,15 @@ compare("hi", "mom");  // calls the template with two nontype parameters
 * ⚠️ **潜在错误**：调用`compare(p1, p2)`会比较指针地址而非字符串内容，这是逻辑错误
 
 ---
-
 <a id="id4"></a>
 ## ✅ 知识点4: 模板特化(Template Specialization)定义
 
 **理论**
-* **定义**：为了处理字符指针（与数组相对），我们可以定义第一个版本`compare`的**模板特化(template specialization)**。
-* **特化概念**：**特化(specialization)**是模板的单独定义，其中一个或多个模板参数被指定为特定类型。
-* **原文描述**：A specialization is a separate definition of the template in which one or more template parameters are specified to have particular types.
+* **定义**：为了处理字符指针（与数组相对），我们可以定义第一个版本`compare`的**模板特化**。
+* **特化概念**：**特化**是模板的单独定义，其中一个或多个模板参数被指定为特定类型。
+
 
 **注意点**
-* 📋 **术语对照**：template specialization（模板特化）、particular types（特定类型）
 * 💡 **关键理解**：特化不是重载，而是为特定类型组合提供替代实现
 
 ---
@@ -114,9 +109,9 @@ compare("hi", "mom");  // calls the template with two nontype parameters
 ## ✅ 知识点5: 定义函数模板特化
 
 **理论**
-* **参数要求**：特化函数模板时，必须为原模板中的**每个模板参数(every template parameter)**提供实参。
-* **语法标识**：为了表明正在特化模板，使用关键字`template`后跟一对**空的尖括号(empty pair of angle brackets <>)**。
-* **空括号含义**：空括号表示将为原模板的**所有模板参数(all the template parameters)**提供实参。
+* **参数要求**：特化函数模板时，必须为原模板中的**每个模板参数**提供实参。
+* **语法标识**：为了表明正在特化模板，使用关键字`template`后跟一对**空的尖括号**。
+* **空括号含义**：空括号表示将为原模板的**所有模板参数**提供实参。
 
 **教材示例代码**
 ```cpp
