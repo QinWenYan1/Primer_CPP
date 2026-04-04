@@ -102,7 +102,6 @@ compare("hi", "mom");  // calls the template with two nontype parameters
 
 **注意点**
 * 💡 **关键理解**：特化不是重载，而是为特定类型组合提供替代实现
-
 ---
 
 <a id="id5"></a>
@@ -110,7 +109,7 @@ compare("hi", "mom");  // calls the template with two nontype parameters
 
 **理论**
 * **参数要求**：特化函数模板时，必须为原模板中的**每个模板参数**提供实参。
-* **语法标识**：为了表明正在特化模板，使用关键字`template`后跟一对**空的尖括号**。
+* **语法标识**：为了表明正在特化模板，使用关键字`template`后跟一对**空的尖括号**`<>`。
 * **空括号含义**：空括号表示将为原模板的**所有模板参数**提供实参。
 
 **教材示例代码**
@@ -133,17 +132,17 @@ int compare(const char* const &p1, const char* const &p2)
 ## ✅ 知识点6: 特化的函数参数类型匹配
 
 **理论**
-* **理解难点**：理解此特化的难点在于**函数参数类型(function parameter types)**。
+* **理解难点**：理解此特化的难点在于**函数参数类型**。
 * **匹配要求**：定义特化时，函数参数类型必须与先前声明模板中的对应类型匹配。
 * **原模板回顾**：正在特化的是：
   ```cpp
   template <typename T> int compare(const T&, const T&);
   ```
-  其中函数参数是**对const类型的引用(references to a const type)**。
+  其中函数参数是**对`const`类型的引用**。
 
 **注意点**
 * 📋 **类型对应关系**：原模板中`const T&`，当`T`被替换为具体类型时，需要准确定义对应的引用类型
-* ⚠️ **const修饰复杂性**：涉及指针时，const的位置决定不同的语义（见下一点）
+* ⚠️ **`const`修饰复杂性**：涉及指针时，`const`的位置决定不同的语义
 
 ---
 
@@ -152,12 +151,12 @@ int compare(const char* const &p1, const char* const &p2)
 
 **理论**
 * **特化目标**：我们想定义此函数的特化，其中`T`为`const char*`。
-* **引用要求**：我们的函数需要**该类型的const版本的引用(reference to the const version of this type)**。
-* **指针类型的const版本**：指针类型的const版本是**常量指针(constant pointer)**，区别于**指向const的指针(pointer to const)**（§ 2.4.2, p. 63）。
-* **最终类型**：特化中需要使用的类型是`const char* const &`，即**指向const char的const指针的引用(a reference to a const pointer to const char)**。
+* **引用要求**：我们的函数需要**该类型的`const`版本的引用**。
+* **指针类型的`const`版本**：指针类型的`const`版本是**常量指针**，区别于**指向`const`的指针**（§ 2.4.2）。
+* **最终类型**：特化中需要使用的类型是`const char*`，`const &`，即**指向`const char`的`const`指针的引用**。
 * **类型分解**：
-  * `const char*`：指向const char的指针
-  * `const char* const`：指向const char的const指针（指针本身不可变）
+  * `const char*`：指向`const char`的指针
+  * `const char* const`：指向`const char`的`const`指针（指针本身不可变）
   * `const char* const &`：上述类型的引用
 
 **教材示例代码**
@@ -166,7 +165,6 @@ int compare(const char* const &p1, const char* const &p2)
 ```
 
 **注意点**
-* 📋 **术语对照**：constant pointer（常量指针，指针本身不可修改）、pointer to const（指向const的指针，指向内容不可修改）
 * ⚠️ **常见混淆**：`const char*` vs `char* const` vs `const char* const` 三种不同语义
 * 🔧 **阅读技巧**：从右向左读——`&`（引用）→`const`（常量）→`*`（指针）→`const char`（const字符）
 
@@ -176,9 +174,9 @@ int compare(const char* const &p1, const char* const &p2)
 ## ✅ 知识点8: 函数重载与模板特化的区别
 
 **理论**
-* **本质差异**：定义函数模板特化时，实质上是在**接管编译器的工作(taking over the job of the compiler)**——即为原模板的特定实例化提供定义。
+* **本质差异**：定义函数模板特化时，实质上是在**接管编译器的工作**——即为原模板的特定实例化提供定义。
 * **重要认知**：特化是**实例化(instantiation)**，不是函数名的**重载实例(overloaded instance)**。
-* **原文描述**：When we define a function template specialization, we are essentially taking over the job of the compiler. That is, we are supplying the definition to use for a specific instantiation of the original template. It is important to realize that a specialization is an instantiation; it is not an overloaded instance of the function name.
+
 
 **注意点**
 * 📋 **核心区别**：特化属于模板实例化体系，重载属于函数签名体系
@@ -190,11 +188,11 @@ int compare(const char* const &p1, const char* const &p2)
 ## ✅ 知识点9: 特化不影响函数匹配
 
 **理论**
-* **Note说明**：**特化实例化模板，它们不重载模板。因此，特化不影响函数匹配(Specializations instantiate a template; they do not overload it. As a result, specializations do not affect function matching)**。
+* **Note说明**：**特化实例化模板，它们不重载模板。因此，特化不影响函数匹配**。
 * **匹配示例**：当调用`compare("hi", "mom")`时：
   * 两个函数模板都可行的，且提供同样好（精确）的匹配
-  * 但带字符数组参数的版本**更特化(more specialized)**（§ 16.3, p. 695），因此选择该版本
-  * 注意：这里的选择是基于**重载解析(overloading)**，而非特化匹配
+  * 但带字符数组参数的版本**更特化**（§ 16.3），因此选择该版本
+  * 注意：这里的选择是基于**重载解析**，而非特化匹配
 
 **注意点**
 * ⚠️ **关键规则**：特化不改变函数匹配过程，它只在匹配确定后选择使用哪个实现
@@ -206,11 +204,11 @@ int compare(const char* const &p1, const char* const &p2)
 ## ✅ 知识点10: 非模板函数与特化的解析差异
 
 **理论**
-* **假设场景**：如果我们把处理字符指针的`compare`定义为**普通非模板函数(plain nontemplate function)**（而非模板特化），调用解析会不同。
+* **假设场景**：如果我们把处理字符指针的`compare`定义为**普通非模板函数**（而非模板特化），调用解析会不同。
 * **三候选情况**：此时会有三个可行函数：
   1. 两个模板版本（通用版和数组版）
   2. 非模板字符指针版本
-* **选择结果**：三者都提供同样好的匹配时，**非模板函数被选中(nontemplate is selected)**（§ 16.3, p. 695）。
+* **选择结果**：三者都提供同样好的匹配时，**非模板函数被选中**（§ 16.3）。
 
 **注意点**
 * 📋 **优先级规则**：非模板函数 vs 模板特化 vs 通用模板，在重载解析中的优先级差异
