@@ -220,10 +220,10 @@ int compare(const char* const &p1, const char* const &p2)
 ## ✅ 知识点11: 作用域规则适用于特化
 
 **理论**
-* **Key Concept**：**普通作用域规则适用于特化(Ordinary Scope Rules Apply to Specializations)**。
+* **Key Concept**：**普通作用域规则适用于特化**。
 * **作用域要求**：
-  1. 要特化模板，**原模板的声明必须在作用域内(a declaration for the original template must be in scope)**。
-  2. 此外，**特化的声明必须在任何代码使用该模板实例化之前(a declaration for a specialization must be in scope before any code uses that instantiation)**。
+  1. 要特化模板，**原模板的声明必须在作用域内**。
+  2. 此外，**特化的声明必须在任何代码使用该模板实例化之前**。
 * **与普通声明的区别**：对于普通类和函数，缺少声明通常容易发现（编译器会报错）。但如果特化声明缺失，编译器通常会使用原模板生成代码。
 
 **注意点**
@@ -236,8 +236,8 @@ int compare(const char* const &p1, const char* const &p2)
 ## ✅ 知识点12: 特化声明顺序的重要性
 
 **理论**
-* **错误类型**：程序同时使用**特化(specialization)**和**原模板实例化(instantiation of the original template)**且使用相同模板实参集是**错误(error)**。
-* **编译器检测**：然而，这是编译器**不太可能检测到的错误(unlikely to detect)**。
+* **错误类型**：程序同时使用**特化**和**原模板实例化**且使用相同模板实参集是**错误**。
+* **编译器检测**：然而，这是编译器**不太可能检测到的错误**。
 * **原因**：如果特化声明缺失，编译器会静默使用原模板，可能导致链接时错误或不一致行为。
 
 **注意点**
@@ -250,8 +250,8 @@ int compare(const char* const &p1, const char* const &p2)
 ## ✅ 知识点13: 最佳实践：头文件组织
 
 **理论**
-* **Best Practices建议**：**模板及其特化应声明在同一头文件中(Templates and their specializations should be declared in the same header file)**。
-* **顺序要求**：给定名称的所有模板声明应**先出现(appear first)**，然后是这些模板的任何特化。
+* **Best Practices建议**：**模板及其特化应声明在同一头文件中**。
+* **顺序要求**：给定名称的所有模板声明应**先出现**，然后是这些模板的任何特化。
 
 **注意点**
 * 🔧 **工程实践**：将特化放在原模板声明之后，确保编译器先看到通用定义再看到特定实现
