@@ -225,6 +225,8 @@ int compare(const char* const &p1, const char* const &p2)
   1. 要特化模板，**原模板的声明必须在作用域内**。
   2. 此外，**特化的声明必须在任何代码使用该模板实例化之前**。
 * **与普通声明的区别**：对于普通类和函数，缺少声明通常容易发现（编译器会报错）。但如果特化声明缺失，编译器通常会使用原模板生成代码。
+* **特化的定义顺序**：**原模板在前，特化在后**
+
 
 **注意点**
 * ⚠️ **隐蔽错误**：因为编译器能在特化缺失时实例化原模板，声明顺序错误容易犯但难发现
@@ -265,12 +267,12 @@ int compare(const char* const &p1, const char* const &p2)
 **理论**
 * **扩展能力**：除了特化函数模板，我们还可以**特化类模板(specialize class templates)**。
 * **示例场景**：为`Sales_data`特化库的`hash`模板，用于在无序容器中存储`Sales_data`对象。
-* **默认机制**：默认情况下，无序容器使用`hash<key_type>`（§ 11.4, p. 444）来组织元素。
+* **默认机制**：默认情况下，无序容器使用`hash<key_type>`（§11.4）来组织元素。
 * **要求**：要用自己的数据类型使用此默认机制，必须定义`hash`模板的特化。
 
 **注意点**
 * 📋 **应用场景**：类模板特化常用于为标准库类型（如hash、less等）提供自定义类型的支持
-* 🔄 **知识关联**：回顾§ 11.4关于无序关联容器的使用
+
 
 ---
 
@@ -279,13 +281,13 @@ int compare(const char* const &p1, const char* const &p2)
 
 **理论**
 * **必须定义的成员**：特化的`hash`类必须定义：
-  1. **重载的调用运算符(overloaded call operator)**（§ 14.8, p. 571）：返回`size_t`，接受容器键类型的对象
-  2. **两个类型成员(two type members)**：`result_type`和`argument_type`，分别是调用运算符的返回类型和参数类型
-  3. **默认构造函数(default constructor)**和**拷贝赋值运算符(copy-assignment operator)**（可以隐式定义，§ 13.1.2, p. 500）
+  1. **重载的调用运算符**（§14.8）：返回`size_t`，接受容器键类型的对象
+  2. **两个类型成员**：`result_type`和`argument_type`，分别是调用运算符的返回类型和参数类型
+  3. **默认构造函数**和**拷贝赋值运算符**（可以隐式定义，§ 13.1.2）
 
 **注意点**
 * 📋 **接口契约**：遵循标准库hash的接口规范，确保与无序容器兼容
-* 🔧 **类型定义**：使用typedef或using定义result_type和argument_type
+* 🔧 **类型定义**：使用`typedef`或`using`定义`result_type`和`argument_type`
 
 ---
 
@@ -293,8 +295,8 @@ int compare(const char* const &p1, const char* const &p2)
 ## ✅ 知识点16: 命名空间中的特化
 
 **理论**
-* **复杂性来源**：定义`hash`特化的唯一复杂点在于，特化模板时必须在**原模板定义的同一命名空间(same namespace in which the original template is defined)**中进行。
-* **操作方法**：要添加成员到命名空间，必须先**打开命名空间(open the namespace)**。
+* **复杂性来源**：定义`hash`特化的唯一复杂点在于，特化模板时必须在**原模板定义的同一命名空间**中进行。
+* **操作方法**：要添加成员到命名空间，必须先**打开命名空间**。
 * **语法**：使用`namespace std { ... }`打开std命名空间，在其中定义特化。
 
 **教材示例代码**
@@ -305,8 +307,8 @@ namespace std {
 ```
 
 **注意点**
-* ⚠️ **命名空间规则**：不能直接在全局命名空间为std中的模板添加特化，必须打开std命名空间
-* 💡 **注意事项**：关闭命名空间的大括号后**不需要分号(no semicolon)**
+* ⚠️ **命名空间规则**：不能直接在全局命名空间为`std`中的模板添加特化，必须打开`std`命名空间
+* 💡 **注意事项**：关闭命名空间的大括号后**不需要分号**
 
 ---
 
@@ -314,11 +316,11 @@ namespace std {
 ## ✅ 知识点17: hash<Sales_data>实现细节
 
 **理论**
-* **特化标识**：`hash<Sales_data>`定义以`template<>`开头，表明正在定义**完全特化的模板(fully specialized template)**。
+* **特化标识**：`hash<Sales_data>`定义以`template<>`开头，表明正在定义**完全特化的模板**。
 * **原模板关系**：正在特化的模板名为`hash`，特化版本是`hash<Sales_data>`。类成员直接遵循特化hash的要求。
 * **实现策略**：将定义好的哈希函数的复杂性委托给库。库为内置类型和许多库类型定义了hash的特化。
-* **异或组合**：使用`hash<string>`对象生成bookNo的哈希码，`hash<unsigned>`生成units_sold的哈希码，`hash<double>`生成revenue的哈希码。然后使用**异或(exclusive or)**（§ 4.8, p. 154）组合这些结果形成整体的哈希码。
-* **设计考虑**：为所有三个数据成员定义哈希函数，使其与`Sales_data`的`operator==`定义兼容（§ 14.3.1, p. 561）。默认无序容器使用与键类型对应的hash特化和相等运算符。
+* **异或组合**：使用`hash<string>`对象生成`bookNo`的哈希码，`hash<unsigned>`生成`units_sold`的哈希码，`hash<double>`生成`revenue`的哈希码。然后使用**异或(exclusive or)**（§4.8）组合这些结果形成整体的哈希码。
+* **设计考虑**：为所有三个数据成员定义哈希函数，使其与`Sales_data`的`operator==`定义兼容（§14.3.1）。默认无序容器使用与键类型对应的`hash`特化和相等运算符。
 
 **教材示例代码**
 ```cpp
@@ -345,7 +347,7 @@ hash<Sales_data>::operator()(const Sales_data& s) const
 
 **注意点**
 * 📋 **实现技术**：组合多个哈希值时，异或是常用技术
-* ⚠️ **一致性要求**：如果两个对象相等（operator==返回true），它们必须产生相同的哈希值
+* ⚠️ **一致性要求**：如果两个对象相等（`operator==`返回`true`），它们必须产生相同的哈希值
 
 ---
 
@@ -377,12 +379,11 @@ class Sales_data {
 ## ✅ 知识点19: 类模板部分特化(Partial Specializations)
 
 **理论**
-* **与函数模板的区别**：与函数模板不同，类模板特化**不需要为每个模板参数提供实参(does not have to supply an argument for every template parameter)**。
-* **部分指定**：可以指定**部分而非全部(some, but not all)**模板参数，或指定参数的**部分特性(some, but not all, aspects)**。
-* **定义**：类模板**部分特化(partial specialization)**本身也是模板。用户必须为未被特化固定的那些模板参数提供实参。
+* **与函数模板的区别**：与函数模板不同，类模板特化**不需要为每个模板参数提供实参**。
+* **部分指定**：可以指定**部分而非全部**模板参数，或指定参数的**部分特性**。
+* **定义**：类模板**部分特化**本身也是模板。用户必须为未被特化固定的那些模板参数提供实参。
 
 **注意点**
-* 📋 **术语对照**：partial specialization（部分特化）、full specialization（完全特化）
 * 💡 **灵活性**：部分特化允许为类型模式（如指针类型、引用类型）提供通用特化，而非单一具体类型
 
 ---
