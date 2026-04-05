@@ -25,7 +25,7 @@
 
 ### 7.5 构造函数再探 🔄
 构造函数初始化列表、委托构造函数、默认构造函数  
-[→ 查看笔记](./note_7_5_constructors_revisited.md)
+[→ 查看笔记](./note_7_5_constructor_revisited.md)
 
 ### 7.6 类的静态成员 🌐
 静态成员定义、使用、静态成员函数  
