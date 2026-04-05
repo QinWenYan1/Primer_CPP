@@ -392,8 +392,33 @@ class Sales_data {
 ## ✅ 知识点20: 部分特化的限制
 
 **理论**
-* **Note说明**：**我们只能部分特化类模板，不能部分特化函数模板(We can partially specialize only a class template. We cannot partially specialize a function template)**。
+* **Note说明**：**我们只能部分特化类模板，不能部分特化函数模板**。
 * **原因**：函数可以通过重载实现类似功能，而类没有重载机制，因此需要部分特化来提供类型模式匹配。
+* **类模版部分特例化 VS 函数模版重载**：
+  * 类模板部分特化是"同一个模板的变形版本"
+  * 函数模板重载是"多个不同的模板"。就像类和函数本身就不一样，它们的模板机制自然也不同。
+
+
+**示例代码**
+```cpp
+// 通用版本（相当于"主模板"）
+template <typename T>
+int compare(const T& a, const T& b) {
+    return a < b ? -1 : (a > b ? 1 : 0);
+}
+
+// "部分特化"效果：为所有指针类型提供重载版本（注意不是特化！）
+template <typename T>
+int compare(T* a, T* b) {  // 重载，匹配所有指针类型
+    return compare(*a, *b);  // 解引用后比较
+}
+
+// 完全特化：为const char*提供特殊版本（笔记知识点5）
+template <>
+int compare<const char*>(const char* const &a, const char* const &b) {
+    return strcmp(a, b);
+}
+```
 
 **注意点**
 * ⚠️ **语法限制**：函数模板只有完全特化，没有部分特化语法
@@ -405,9 +430,9 @@ class Sales_data {
 ## ✅ 知识点21: remove_reference示例
 
 **理论**
-* **示例来源**：在§ 16.2.3（p. 684）中介绍了库的`remove_reference`类型。该模板通过一系列特化工作。
+* **示例来源**：在§ 16.2.3中介绍了库的`remove_reference`类型。该模板通过一系列特化工作。
 * **三个版本**：
-  1. **最通用版本(original, most general template)**：模板参数为`class T`，成员`type`为`T`
+  1. **最通用版本**：模板参数为`class T`，成员`type`为`T`
   2. **左值引用部分特化**：`remove_reference<T&>`，匹配左值引用，成员`type`为`T`
   3. **右值引用部分特化**：`remove_reference<T&&>`，匹配右值引用，成员`type`为`T`
 
@@ -434,12 +459,12 @@ template <class T> struct remove_reference<T&&> // rvalue references
 ## ✅ 知识点22: 部分特化的参数匹配
 
 **理论**
-* **部分特化特性**：部分特化的模板参数列表是原模板参数列表的**子集(subset)**或**特化(specialization)**。
-* **示例情况**：本例中特化具有与原模板**相同数量的参数(same number of parameters)**，但参数类型不同。
+* **部分特化特性**：部分特化的模板参数列表是原模板参数列表的**子集**或**特化**。
+* **示例情况**：本例中特化具有与原模板**相同数量的参数**，但参数类型不同。
 * **使用示例**：
-  * `decltype(42)`是`int`，使用**原模板(original template)**
-  * `decltype(i)`是`int&`，使用**第一个部分特化(first partial specialization)**
-  * `decltype(std::move(i))`是`int&&`，使用**第二个部分特化(second partial specialization)**
+  * `decltype(42)`是`int`，使用**原模板**
+  * `decltype(i)`是`int&`，使用**第一个部分特化**
+  * `decltype(std::move(i))`是`int&&`，使用**第二个部分特化**
 * **结果**：三个变量`a`、`b`和`c`都具有类型`int`。
 
 **教材示例代码**
@@ -463,7 +488,7 @@ remove_reference<decltype(std::move(i))>::type c;
 ## ✅ 知识点23: 特化成员但不特化类
 
 **理论**
-* **技术能力**：可以只特化**特定成员函数(specific member function(s))**而非整个模板类。
+* **技术能力**：可以只特化**特定成员函数**而非整个模板类。
 * **示例场景**：如果`Foo`是带成员`Bar`的模板类，可以只特化该成员。
 * **语法**：`template<> void Foo<int>::Bar() { ... }`表示正在特化`Foo<int>`类的`Bar`成员。
 * **成员来源**：`Foo<int>`的其他成员由`Foo`模板提供。
