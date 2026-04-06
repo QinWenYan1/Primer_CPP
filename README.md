@@ -49,6 +49,7 @@
 - [第 13 章：拷贝控制](./Chapter13_copy_control/README.md) — 拷贝构造, 移动语义, 右值引用, 三五法则
 - [第 14 章：重载运算与类型转换](./Chapter14_overloaded_operations_and_conversions/README.md) — 运算符重载, 类型转换运算符
 - [第 15 章：面向对象程序设计](./Chapter15_object_oriented_programming/README.md) — 继承, 虚函数, 多态, 抽象类, `override`, `final`
+- [第 16 章：模板与泛型编程](./Chapter16_templates_and_generic_programming/README.md) — 函数模板, 类模板, 模板实参推断, 可变参数模板, 模板特化
 
 </details>
 
