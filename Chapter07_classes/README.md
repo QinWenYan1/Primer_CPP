@@ -89,11 +89,11 @@
 <details>
 <summary><b>🔄 构造函数再探</b></summary>
 
-- [构造函数初始化列表](./note_7_5_constructors_revisited.md)
-- [委托构造函数](./note_7_5_constructors_revisited.md)
-- [默认构造函数](./note_7_5_constructors_revisited.md)
-- [隐式类类型转换](./note_7_5_constructors_revisited.md)
-- [explicit 关键字](./note_7_5_constructors_revisited.md)
+- [构造函数初始化列表](./note_7_5_constructor_revisited.md)
+- [委托构造函数](./note_7_5_constructor_revisited.md)
+- [默认构造函数](./note_7_5_constructor_revisited.md)
+- [隐式类类型转换](./note_7_5_constructor_revisited.md)
+- [explicit 关键字](./note_7_5_constructor_revisited.md)
 
 </details>
 
